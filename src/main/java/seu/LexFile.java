@@ -27,19 +27,22 @@ public class LexFile {
     private void readMacros() throws Exception {
         while (true) {
             String lineOfReader = reader.readLine();
-            if (lineOfReader == null) {
-                System.out.println("EOF");
-                return;
-            } else if (lineOfReader.startsWith("%%")) return;
+            if (lineOfReader == null) throw new Exception("Lex format error - miss macro definitions");
+            else if (lineOfReader.startsWith("%%")) return;
             else if (lineOfReader.startsWith("%{")) readHeaders();
-            else ;//TODO: add regular definition pairs
+            else {
+                int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
+                String macro = lineOfReader.substring(0, firstIndexOfWhiteSpace);
+                String definition = lineOfReader.substring(firstIndexOfWhiteSpace).trim();
+                macros.add(new Pair<>(macro, definition));
+            }
         }
     }
 
     private void readHeaders() throws Exception {
         while (true) {
             String lineOfReader = reader.readLine();
-            if (lineOfReader == null) throw new Exception("Lex format error");
+            if (lineOfReader == null) throw new Exception("Lex format error - miss another \"%}\"");
             if (lineOfReader.startsWith("%}")) return;
             headers.append(lineOfReader).append("\n");
         }
