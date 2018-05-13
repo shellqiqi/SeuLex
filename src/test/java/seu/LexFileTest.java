@@ -30,18 +30,18 @@ public class LexFileTest {
         expected.put("ws", "[ \\t\\n]+");
         expected.put("letter", "[A-Za-z]");
         expected.put("digit", "[0-9]");
-        expected.put("id", "{letter}({letter}|{digit})*");
-        expected.put("integer", "{digit}+");
+        expected.put("id", "[A-Za-z]([A-Za-z]|[0-9])*");
+        expected.put("integer", "[0-9]+");
         assertEquals(expected, lexFile.macros);
     }
 
     @Test
     public void readRegExps() {
         HashMap<String, String> expected = new HashMap<>();
-        expected.put("{ws}", "{}");
+        expected.put("[ \\t\\n]+", "{}");
         expected.put("if", "{return IF;}");
-        expected.put("{id}", "{return ID;}");
-        expected.put("{integer}", "{return INTEGER;}");
+        expected.put("[A-Za-z]([A-Za-z]|[0-9])*", "{return ID;}");
+        expected.put("[0-9]+", "{return INTEGER;}");
         assertEquals(expected, lexFile.regExps);
     }
 

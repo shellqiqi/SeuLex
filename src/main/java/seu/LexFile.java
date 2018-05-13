@@ -34,7 +34,7 @@ public class LexFile {
             else {
                 int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
                 String macro = lineOfReader.substring(0, firstIndexOfWhiteSpace);
-                String definition = lineOfReader.substring(firstIndexOfWhiteSpace).trim();
+                String definition = expandMacro(lineOfReader.substring(firstIndexOfWhiteSpace).trim());
                 macros.put(macro, definition);
             }
         }
@@ -56,7 +56,7 @@ public class LexFile {
             else if (lineOfReader.startsWith("%%")) return;
             else {
                 int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
-                String regExp = lineOfReader.substring(0, firstIndexOfWhiteSpace);
+                String regExp = expandMacro(lineOfReader.substring(0, firstIndexOfWhiteSpace));
                 String action = lineOfReader.substring(firstIndexOfWhiteSpace).trim();
                 regExps.put(regExp, action);
             }
@@ -73,5 +73,26 @@ public class LexFile {
                 userSeg.append(lineOfReader).append("\n");
             }
         }
+    }
+
+    private String expandMacro(String expWithMacro) {
+        Integer indexOfLeftBrace = null;
+        Integer indexOfRightBrace;
+        for (int i = 0; i < expWithMacro.length(); i++) {
+            if (expWithMacro.charAt(i) == '{') {
+                indexOfLeftBrace = i;
+            }
+            if (expWithMacro.charAt(i) == '}') {
+                indexOfRightBrace = i;
+                if (indexOfLeftBrace != null) {
+                    String key = expWithMacro.substring(indexOfLeftBrace + 1, indexOfRightBrace);
+                    if (macros.containsKey(key)) {
+                        expWithMacro = expWithMacro.replace("{" + key + "}", macros.get(key));
+                    }
+                }
+                indexOfLeftBrace = null;
+            }
+        }
+        return expWithMacro;
     }
 }
