@@ -1,10 +1,9 @@
 package seu;
 
-import org.javatuples.Pair;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Vector;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -27,22 +26,22 @@ public class LexFileTest {
 
     @Test
     public void readMacros() {
-        Vector<Pair<String, String>> expected = new Vector<>();
-        expected.add(new Pair<>("ws", "[ \\t\\n]+"));
-        expected.add(new Pair<>("letter", "[A-Za-z]"));
-        expected.add(new Pair<>("digit", "[0-9]"));
-        expected.add(new Pair<>("id", "{letter}({letter}|{digit})*"));
-        expected.add(new Pair<>("integer", "{digit}+"));
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("ws", "[ \\t\\n]+");
+        expected.put("letter", "[A-Za-z]");
+        expected.put("digit", "[0-9]");
+        expected.put("id", "{letter}({letter}|{digit})*");
+        expected.put("integer", "{digit}+");
         assertEquals(expected, lexFile.macros);
     }
 
     @Test
     public void readRegExps() {
-        Vector<Pair<String, String>> expected = new Vector<>();
-        expected.add(new Pair<>("{ws}", "{}"));
-        expected.add(new Pair<>("if", "{return IF;}"));
-        expected.add(new Pair<>("{id}", "{return ID;}"));
-        expected.add(new Pair<>("{integer}", "{return INTEGER;}"));
+        HashMap<String, String> expected = new HashMap<>();
+        expected.put("{ws}", "{}");
+        expected.put("if", "{return IF;}");
+        expected.put("{id}", "{return ID;}");
+        expected.put("{integer}", "{return INTEGER;}");
         assertEquals(expected, lexFile.regExps);
     }
 
