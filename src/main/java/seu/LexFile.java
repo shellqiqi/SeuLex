@@ -4,6 +4,7 @@ import org.javatuples.Pair;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Vector;
 
 public class LexFile {
@@ -22,6 +23,8 @@ public class LexFile {
     public LexFile(String filePath) throws Exception {
         reader = new BufferedReader(new FileReader(filePath));
         readMacros();
+        readRegExps();
+        readUserSeg();
     }
 
     private void readMacros() throws Exception {
@@ -44,15 +47,33 @@ public class LexFile {
             String lineOfReader = reader.readLine();
             if (lineOfReader == null) throw new Exception("Lex format error - miss another \"%}\"");
             if (lineOfReader.startsWith("%}")) return;
-            headers.append(lineOfReader).append("\n");
+            else headers.append(lineOfReader).append("\n");
         }
     }
 
-    private void readRegExps() {
-        //TODO
+    private void readRegExps() throws Exception {
+        while (true) {
+            String lineOfReader = reader.readLine();
+            if (lineOfReader == null) throw new Exception("Lex format error - miss user segment");
+            else if (lineOfReader.startsWith("%%")) return;
+            else {
+                int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
+                String regExp = lineOfReader.substring(0, firstIndexOfWhiteSpace);
+                String action = lineOfReader.substring(firstIndexOfWhiteSpace).trim();
+                regExps.add(new Pair<>(regExp, action));
+            }
+        }
     }
 
-    private void readUserSeg() {
-        //TODO
+    private void readUserSeg() throws IOException {
+        while (true) {
+            String lineOfReader = reader.readLine();
+            if (lineOfReader == null) {
+                System.out.println("EOF");
+                return;
+            } else {
+                userSeg.append(lineOfReader).append("\n");
+            }
+        }
     }
 }
