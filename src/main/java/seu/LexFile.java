@@ -1,9 +1,12 @@
 package seu;
 
+import org.javatuples.Pair;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class LexFile {
 
@@ -14,7 +17,7 @@ public class LexFile {
     /* Macros with regular definition */
     public HashMap<String, String> macros = new HashMap<>();
     /* Regular expressions with action */
-    public HashMap<String, String> regExps = new HashMap<>();
+    public Vector<Pair<String, String>> regExps = new Vector<>();
     /* User segment */
     public StringBuffer userSeg = new StringBuffer();
 
@@ -58,7 +61,7 @@ public class LexFile {
                 int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
                 String regExp = expandMacro(lineOfReader.substring(0, firstIndexOfWhiteSpace));
                 String action = lineOfReader.substring(firstIndexOfWhiteSpace).trim();
-                regExps.put(regExp, action);
+                regExps.add(new Pair<>(regExp, action));
             }
         }
     }

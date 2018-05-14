@@ -1,9 +1,11 @@
 package seu;
 
+import org.javatuples.Pair;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Vector;
 
 import static org.junit.Assert.*;
 
@@ -37,11 +39,11 @@ public class LexFileTest {
 
     @Test
     public void readRegExps() {
-        HashMap<String, String> expected = new HashMap<>();
-        expected.put("[ \\t\\n]+", "{}");
-        expected.put("if", "{return IF;}");
-        expected.put("[A-Za-z]([A-Za-z]|[0-9])*", "{return ID;}");
-        expected.put("[0-9]+", "{return INTEGER;}");
+        Vector<Pair<String, String>> expected = new Vector<>();
+        expected.add(new Pair<>("[ \\t\\n]+", "{}"));
+        expected.add(new Pair<>("if", "{return IF;}"));
+        expected.add(new Pair<>("[A-Za-z]([A-Za-z]|[0-9])*", "{return ID;}"));
+        expected.add(new Pair<>("[0-9]+", "{return INTEGER;}"));
         assertEquals(expected, lexFile.regExps);
     }
 
