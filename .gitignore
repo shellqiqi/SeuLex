@@ -52,3 +52,4 @@ target/
 .pdf
 .idea/
 *.iml
+dependency-reduced-pom.xml
