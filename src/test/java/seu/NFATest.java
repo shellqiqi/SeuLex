@@ -36,4 +36,14 @@ public class NFATest {
         nfa3 = NFA.or(nfa3, nfa3);
         System.out.println(nfa3.debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void star() throws Exception {
+        NFA nfa1 = new NFA('0', '3');
+        NFA nfa2 = new NFA('3', '5');
+        System.out.println(NFA.star(nfa1).debugMessage());
+        System.out.println(NFA.star(nfa2).debugMessage());
+        System.out.println(NFA.star(new NFA()).debugMessage());
+    }
 }

@@ -59,7 +59,7 @@ public class NFA {
         return stateRow;
     }
 
-    private static Vector<HashSet<Integer>> initStateRow(char ch, Vector<Integer> transitions) {
+    private static Vector<HashSet<Integer>> initStateRow(char ch, HashSet<Integer> transitions) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, ch, transitions);
         return stateRow;
@@ -75,8 +75,8 @@ public class NFA {
         transitionTable.elementAt(index).elementAt(ch).add(transition);
     }
 
-    private void addTransition(int index, char ch, Vector<Integer> transitions) {
-        for (int transition : transitions) addTransition(index, ch, transition);
+    private void addTransition(int index, char ch, HashSet<Integer> transitions) {
+        transitionTable.elementAt(index).elementAt(ch).addAll(transitions);
     }
 
     private void addTransition(int index, Vector<Character> chars, int transition) {
@@ -87,8 +87,8 @@ public class NFA {
         stateRow.elementAt(ch).add(transition);
     }
 
-    private static void addTransition(Vector<HashSet<Integer>> stateRow, char ch, Vector<Integer> transitions) {
-        for (int transition : transitions) addTransition(stateRow, ch, transition);
+    private static void addTransition(Vector<HashSet<Integer>> stateRow, char ch, HashSet<Integer> transitions) {
+        stateRow.elementAt(ch).addAll(transitions);
     }
 
     private static void addTransition(Vector<HashSet<Integer>> stateRow, Vector<Character> chars, int transition) {
@@ -123,8 +123,8 @@ public class NFA {
 
     public static NFA or(NFA... nfas) {
         NFA result = new NFA();
-        Vector<Integer> starts = new Vector<>();
-        Vector<Integer> accepts = new Vector<>();
+        HashSet<Integer> starts = new HashSet<>();
+        HashSet<Integer> accepts = new HashSet<>();
         int nextState = 1;
         for (NFA nfa : nfas) {
             starts.add(nextState);
@@ -138,6 +138,22 @@ public class NFA {
         for (Integer state : accepts) {
             addTransition(result.transitionTable.elementAt(state), EPSILON, result.accept);
         }
+        return result;
+    }
+
+    public static NFA star(NFA nfa) {
+        NFA result = new NFA();
+        result.transitionTable.addAll(nfa.increasedStateNumber(1));
+        result.transitionTable.add(initStateRow());
+        result.accept += nfa.accept + 2;
+        HashSet<Integer> startState = new HashSet<>();
+        startState.add(1);
+        startState.add(result.accept);
+        addTransition(result.transitionTable.firstElement(), EPSILON, startState);
+        HashSet<Integer> lastState = new HashSet<>();
+        lastState.add(1);
+        lastState.add(result.accept);
+        addTransition(result.transitionTable.elementAt(result.accept - 1), EPSILON, lastState);
         return result;
     }
 
