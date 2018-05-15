@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class NFA {
-    public final int EPSILON = 128;
-    public final int COLUMNS = 129;
+    public final static char EPSILON = 128;
+    public final static int COLUMNS = 129;
     public Vector<Vector<HashSet<Integer>>> transitionTable = new Vector<>();
 
-    public final int start = 0;
+    public final static int start = 0;
     public int accept;
 
     public NFA() {
@@ -26,9 +26,9 @@ public class NFA {
 
     public NFA(char from, char to) throws Exception {
         if (from <= to) {
-            char[] cs = new char[to - from + 1];
-            for (int i = 0; i < to - from + 1; i++) cs[i] = ((char) (from + i));
-            Vector<HashSet<Integer>> startStateRow = initStateRow(cs, 1);
+            Vector<Character> chars = new Vector<>();
+            for (int i = 0; i < to - from + 1; i++) chars.add((char) (from + i));
+            Vector<HashSet<Integer>> startStateRow = initStateRow(chars, 1);
             Vector<HashSet<Integer>> acceptStateRow = initStateRow();
             transitionTable.add(startStateRow);
             transitionTable.add(acceptStateRow);
@@ -47,25 +47,25 @@ public class NFA {
         }
     }
 
-    private Vector<HashSet<Integer>> initStateRow() {
+    private static Vector<HashSet<Integer>> initStateRow() {
         Vector<HashSet<Integer>> stateRow = new Vector<>();
         for (int i = 0; i < COLUMNS; i++) stateRow.add(new HashSet<>());
         return stateRow;
     }
 
-    private Vector<HashSet<Integer>> initStateRow(char ch, int transition) {
+    private static Vector<HashSet<Integer>> initStateRow(char ch, int transition) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, ch, transition);
         return stateRow;
     }
 
-    private Vector<HashSet<Integer>> initStateRow(char ch, int[] transitions) {
+    private static Vector<HashSet<Integer>> initStateRow(char ch, Vector<Integer> transitions) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, ch, transitions);
         return stateRow;
     }
 
-    private Vector<HashSet<Integer>> initStateRow(char[] chars, int transition) {
+    private static Vector<HashSet<Integer>> initStateRow(Vector<Character> chars, int transition) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, chars, transition);
         return stateRow;
@@ -75,46 +75,68 @@ public class NFA {
         transitionTable.elementAt(index).elementAt(ch).add(transition);
     }
 
-    private void addTransition(int index, char ch, int[] transitions) {
+    private void addTransition(int index, char ch, Vector<Integer> transitions) {
         for (int transition : transitions) addTransition(index, ch, transition);
     }
 
-    private void addTransition(int index, char[] chars, int transition) {
+    private void addTransition(int index, Vector<Character> chars, int transition) {
         for (char ch : chars) addTransition(index, ch, transition);
     }
 
-    private void addTransition(Vector<HashSet<Integer>> stateRow, char ch, int transition) {
+    private static void addTransition(Vector<HashSet<Integer>> stateRow, char ch, int transition) {
         stateRow.elementAt(ch).add(transition);
     }
 
-    private void addTransition(Vector<HashSet<Integer>> stateRow, char ch, int[] transitions) {
+    private static void addTransition(Vector<HashSet<Integer>> stateRow, char ch, Vector<Integer> transitions) {
         for (int transition : transitions) addTransition(stateRow, ch, transition);
     }
 
-    private void addTransition(Vector<HashSet<Integer>> stateRow, char[] chars, int transition) {
+    private static void addTransition(Vector<HashSet<Integer>> stateRow, Vector<Character> chars, int transition) {
         for (char ch : chars) addTransition(stateRow, ch, transition);
     }
 
-    public NFA increasedStateNumber(int value) {
-        NFA nfa = new NFA(this);
-        for (Vector<HashSet<Integer>> stateRow : nfa.transitionTable) {
+    public Vector<Vector<HashSet<Integer>>> increasedStateNumber(int value) {
+        Vector<Vector<HashSet<Integer>>> newTable = new Vector<>();
+        for (Vector<HashSet<Integer>> stateRow : transitionTable) {
+            Vector<HashSet<Integer>> newRow = new Vector<>();
             for (HashSet<Integer> transitionCell : stateRow) {
+                HashSet<Integer> newCell = new HashSet<>();
                 for (Integer transition : transitionCell) {
-                    transitionCell.remove(transition);
-                    transitionCell.add(transition + value);
+                    newCell.add(transition + value);
                 }
+                newRow.add(newCell);
             }
+            newTable.add(newRow);
         }
-        return nfa;
+        return newTable;
     }
 
     public static NFA concat(NFA... nfas) {
         NFA result = new NFA();
         for (NFA nfa : nfas) {
-            int dValue = result.accept;
+            result.transitionTable.removeElementAt(result.accept);
+            result.transitionTable.addAll(nfa.increasedStateNumber(result.accept));
             result.accept += nfa.accept;
-            result.transitionTable.remove(result.transitionTable.lastElement());
-            result.transitionTable.addAll(nfa.increasedStateNumber(dValue).transitionTable);
+        }
+        return result;
+    }
+
+    public static NFA or(NFA... nfas) {
+        NFA result = new NFA();
+        Vector<Integer> starts = new Vector<>();
+        Vector<Integer> accepts = new Vector<>();
+        int nextState = 1;
+        for (NFA nfa : nfas) {
+            starts.add(nextState);
+            result.transitionTable.addAll(nfa.increasedStateNumber(nextState));
+            accepts.add(nextState + nfa.accept);
+            nextState += nfa.accept + 1;
+        }
+        addTransition(result.transitionTable.firstElement(), EPSILON, starts);
+        result.transitionTable.add(initStateRow());
+        result.accept = nextState;
+        for (Integer state : accepts) {
+            addTransition(result.transitionTable.elementAt(state), EPSILON, result.accept);
         }
         return result;
     }
@@ -134,8 +156,8 @@ public class NFA {
                 buffer.append("[");
                 boolean first = true;
                 for (Integer transition : transitionTable.elementAt(i).elementAt(ch)) {
-                    buffer.append(transition);
                     if (!first) buffer.append(',');
+                    buffer.append(transition);
                     first = false;
                 }
                 buffer.append("] ");
