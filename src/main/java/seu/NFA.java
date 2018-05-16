@@ -41,7 +41,7 @@ public class NFA {
             transitionTable.add(startStateRow);
             transitionTable.add(acceptStateRow);
             accept = 1;
-        } else throw new Exception("Lex syntax error - In [x-y] x must small than y");
+        } else throw new Exception("Lex syntax error - In [x-y] x must be small than y");
     }
 
     public NFA(NFA nfa) {
@@ -288,6 +288,27 @@ public class NFA {
         result.transitionTable.add(acceptStateRow);
         result.accept = 1;
         return result;
+    }
+
+    /**
+     * Repeat NFA for times.
+     *
+     * @param nfa NFA.
+     * @param min Minimum repeat time.
+     * @param max Maximum repeat time.
+     * @return Repeated NFA.
+     */
+    public static NFA repeat(NFA nfa, int min, int max) throws Exception {
+        if (max >= min) {
+            NFA result = new NFA();
+            for (int i = 0; i < max; i++) result = concat(result, nfa);
+            result.transitionTable.add(initStateRow());
+            result.accept = nfa.accept * max + 1;
+            for (int i = min; i <= max; i++) {
+                result.addTransition(i * nfa.accept, EPSILON, result.accept);
+            }
+            return result;
+        } else throw new Exception("Lex syntax error - In {x,y} x must be small than y");
     }
 
     /**

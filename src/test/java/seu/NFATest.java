@@ -89,4 +89,12 @@ public class NFATest {
         NFA nfa1 = NFA.not(characters);
         System.out.println(nfa1.debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void repeat() throws Exception {
+        NFA nfa1 = new NFA('0', '3');
+        NFA nfa2 = NFA.repeat(nfa1, 3, 5);
+        System.out.println(nfa2.debugMessage());
+    }
 }
