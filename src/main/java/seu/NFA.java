@@ -4,11 +4,15 @@ import java.util.HashSet;
 import java.util.Vector;
 
 public class NFA {
+    /* Definition of ε */
     public final static char EPSILON = 128;
+    /* Total columns of transition table */
     public final static int COLUMNS = 129;
+    /* The transition table of the NFA */
     public Vector<Vector<HashSet<Integer>>> transitionTable = new Vector<>();
-
+    /* State to start always 0 */
     public final static int start = 0;
+    /* State to accept */
     public int accept;
 
     public NFA() {
@@ -47,24 +51,50 @@ public class NFA {
         }
     }
 
+    /**
+     * Init a state row with no transition.
+     *
+     * @return A state row.
+     */
     private static Vector<HashSet<Integer>> initStateRow() {
         Vector<HashSet<Integer>> stateRow = new Vector<>();
         for (int i = 0; i < COLUMNS; i++) stateRow.add(new HashSet<>());
         return stateRow;
     }
 
+    /**
+     * Init a state row with a char transit to another state.
+     *
+     * @param ch         char.
+     * @param transition Another state.
+     * @return A state row.
+     */
     private static Vector<HashSet<Integer>> initStateRow(char ch, int transition) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, ch, transition);
         return stateRow;
     }
 
+    /**
+     * Init a state row with a char transit to other states.
+     *
+     * @param ch          char.
+     * @param transitions Other states.
+     * @return A state row.
+     */
     private static Vector<HashSet<Integer>> initStateRow(char ch, HashSet<Integer> transitions) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, ch, transitions);
         return stateRow;
     }
 
+    /**
+     * Init a state row transit to another state with chars.
+     *
+     * @param chars      chars.
+     * @param transition Another state.
+     * @return A state row.
+     */
     private static Vector<HashSet<Integer>> initStateRow(Vector<Character> chars, int transition) {
         Vector<HashSet<Integer>> stateRow = initStateRow();
         addTransition(stateRow, chars, transition);
@@ -95,7 +125,13 @@ public class NFA {
         for (char ch : chars) addTransition(stateRow, ch, transition);
     }
 
-    public Vector<Vector<HashSet<Integer>>> increasedStateNumber(int value) {
+    /**
+     * All state number add a value for every row shifting back.
+     *
+     * @param value Number to add.
+     * @return A copy of origin transition table with state number added.
+     */
+    private Vector<Vector<HashSet<Integer>>> increasedStateNumber(int value) {
         Vector<Vector<HashSet<Integer>>> newTable = new Vector<>();
         for (Vector<HashSet<Integer>> stateRow : transitionTable) {
             Vector<HashSet<Integer>> newRow = new Vector<>();
@@ -111,6 +147,12 @@ public class NFA {
         return newTable;
     }
 
+    /**
+     * Concatenate NFAs all together.
+     *
+     * @param nfas A set of NFAs.
+     * @return NFA after concatenate.
+     */
     public static NFA concat(NFA... nfas) {
         NFA result = new NFA();
         for (NFA nfa : nfas) {
@@ -121,6 +163,12 @@ public class NFA {
         return result;
     }
 
+    /**
+     * Parallel connect NFAs all together.
+     *
+     * @param nfas A set of NFAs.
+     * @return NFA after parallel connection.
+     */
     public static NFA or(NFA... nfas) {
         NFA result = new NFA();
         HashSet<Integer> starts = new HashSet<>();
@@ -141,6 +189,12 @@ public class NFA {
         return result;
     }
 
+    /**
+     * Operation star(*).
+     *
+     * @param nfa NFA.
+     * @return NFA after star.
+     */
     public static NFA star(NFA nfa) {
         NFA result = new NFA();
         result.transitionTable.addAll(nfa.increasedStateNumber(1));
@@ -157,10 +211,21 @@ public class NFA {
         return result;
     }
 
+    /**
+     * Operation plus(+).
+     *
+     * @param nfa NFA.
+     * @return NFA after plus.
+     */
     public static NFA plus(NFA nfa) {
         return concat(nfa, star(nfa));
     }
 
+    /**
+     * Get a table of NFA transition table.
+     *
+     * @return String of the message.
+     */
     public String debugMessage() {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < transitionTable.size(); i++) {
