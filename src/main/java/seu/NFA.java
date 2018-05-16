@@ -312,6 +312,25 @@ public class NFA {
     }
 
     /**
+     * Operation question mark(?).
+     *
+     * @param nfa NFA.
+     * @return NFA with a question mark.
+     */
+    public static NFA question(NFA nfa) {
+        NFA result = new NFA();
+        result.transitionTable.addAll(nfa.increasedStateNumber(1));
+        result.transitionTable.add(initStateRow());
+        result.accept += nfa.accept + 2;
+        HashSet<Integer> startState = new HashSet<>();
+        startState.add(1);
+        startState.add(result.accept);
+        addTransition(result.transitionTable.firstElement(), EPSILON, startState);
+        addTransition(result.transitionTable.elementAt(result.accept - 1), EPSILON, result.accept);
+        return result;
+    }
+
+    /**
      * Get a table of NFA transition table.
      *
      * @return String of the message.

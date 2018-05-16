@@ -97,4 +97,14 @@ public class NFATest {
         NFA nfa2 = NFA.repeat(nfa1, 3, 5);
         System.out.println(nfa2.debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void question() throws Exception {
+        NFA nfa1 = new NFA('0', '3');
+        NFA nfa2 = new NFA('3', '5');
+        System.out.println(NFA.question(nfa1).debugMessage());
+        System.out.println(NFA.question(nfa2).debugMessage());
+        System.out.println(NFA.question(new NFA()).debugMessage());
+    }
 }
