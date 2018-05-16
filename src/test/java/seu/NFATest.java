@@ -56,4 +56,11 @@ public class NFATest {
         System.out.println(NFA.plus(nfa2).debugMessage());
         System.out.println(NFA.plus(new NFA()).debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void dot() {
+        NFA nfa1 = NFA.dot();
+        System.out.println(nfa1.debugMessage());
+    }
 }

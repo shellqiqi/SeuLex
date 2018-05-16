@@ -16,8 +16,12 @@ public class NFA {
     public int accept;
 
     public NFA() {
+        this(false);
+    }
+
+    public NFA(boolean emptyTable) {
         accept = 0;
-        transitionTable.add(initStateRow());
+        if (!emptyTable) transitionTable.add(initStateRow());
     }
 
     public NFA(char ch) {
@@ -219,6 +223,24 @@ public class NFA {
      */
     public static NFA plus(NFA nfa) {
         return concat(nfa, star(nfa));
+    }
+
+    /**
+     * Operation dot(.).
+     *
+     * @return NFA with a dot.
+     */
+    public static NFA dot() {
+        NFA result = new NFA(true);
+        Vector<HashSet<Integer>> startStateRow = initStateRow();
+        Vector<HashSet<Integer>> acceptStateRow = initStateRow();
+        for (int i = 0; i < COLUMNS - 1; i++) {
+            addTransition(startStateRow, (char) i, 1);
+        }
+        result.transitionTable.add(startStateRow);
+        result.transitionTable.add(acceptStateRow);
+        result.accept = 1;
+        return result;
     }
 
     /**
