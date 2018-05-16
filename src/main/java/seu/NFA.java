@@ -15,12 +15,8 @@ public class NFA {
     public int accept;
 
     public NFA() {
-        this(false);
-    }
-
-    public NFA(boolean emptyTable) {
         accept = 0;
-        if (!emptyTable) transitionTable.add(initStateRow());
+        transitionTable.add(initStateRow());
     }
 
     public NFA(char ch) {
