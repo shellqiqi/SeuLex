@@ -244,6 +244,33 @@ public class NFA {
     }
 
     /**
+     * Operation dash(from-to).
+     *
+     * @param from Left char.
+     * @param to   Right char.
+     * @return NFA with a dash.
+     */
+    public static NFA dash(char from, char to) throws Exception {
+        return new NFA(from, to);
+    }
+
+    /**
+     * Operation square brackets([]).
+     * @param chars A vector of characters brackets include in.
+     * @return NFA with square brackets.
+     */
+    public static NFA square(Vector<Character> chars) {
+        NFA result = new NFA(true);
+        Vector<HashSet<Integer>> startStateRow = initStateRow();
+        Vector<HashSet<Integer>> acceptStateRow = initStateRow();
+        addTransition(startStateRow, chars, 1);
+        result.transitionTable.add(startStateRow);
+        result.transitionTable.add(acceptStateRow);
+        result.accept = 1;
+        return result;
+    }
+
+    /**
      * Get a table of NFA transition table.
      *
      * @return String of the message.

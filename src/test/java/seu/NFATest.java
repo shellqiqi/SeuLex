@@ -3,6 +3,8 @@ package seu;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Vector;
+
 import static org.junit.Assert.*;
 
 public class NFATest {
@@ -61,6 +63,18 @@ public class NFATest {
     @Ignore
     public void dot() {
         NFA nfa1 = NFA.dot();
+        System.out.println(nfa1.debugMessage());
+    }
+
+    @Test
+    @Ignore
+    public void square() {
+        Vector<Character> characters = new Vector<>();
+        characters.add('a');
+        characters.add('1');
+        characters.add((char) 0);
+        characters.add(NFA.EPSILON);
+        NFA nfa1 = NFA.square(characters);
         System.out.println(nfa1.debugMessage());
     }
 }
