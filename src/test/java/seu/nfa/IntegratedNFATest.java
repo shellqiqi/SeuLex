@@ -1,9 +1,10 @@
-package seu;
+package seu.nfa;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
+import seu.nfa.IntegratedNFA;
+import seu.nfa.NFA;
+import seu.nfa.NFAUtil;
 
 public class IntegratedNFATest {
 

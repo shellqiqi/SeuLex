@@ -1,4 +1,4 @@
-package seu;
+package seu.dfa;
 
 public class DFAUtil {
 

@@ -1,5 +1,7 @@
 package seu;
 
+import seu.io.LexFile;
+
 public class App {
     public static void main(String[] args) {
         try {

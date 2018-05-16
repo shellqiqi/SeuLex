@@ -1,11 +1,11 @@
-package seu;
+package seu.nfa;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import seu.nfa.NFA;
+import seu.nfa.NFAUtil;
 
 import java.util.Vector;
-
-import static org.junit.Assert.*;
 
 public class NFATest {
 

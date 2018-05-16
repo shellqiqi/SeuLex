@@ -1,4 +1,4 @@
-package seu;
+package seu.nfa;
 
 import java.util.HashSet;
 import java.util.Vector;

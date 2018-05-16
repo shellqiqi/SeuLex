@@ -1,9 +1,9 @@
-package seu;
+package seu.nfa;
 
 import java.util.HashSet;
 import java.util.Vector;
 
-import static seu.NFAUtil.*;
+import static seu.nfa.NFAUtil.*;
 
 public class NFA {
 

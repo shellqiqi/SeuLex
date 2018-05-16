@@ -1,4 +1,4 @@
-package seu;
+package seu.io;
 
 import org.javatuples.Pair;
 

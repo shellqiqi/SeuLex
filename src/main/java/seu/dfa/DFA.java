@@ -1,4 +1,6 @@
-package seu;
+package seu.dfa;
+
+import seu.nfa.IntegratedNFA;
 
 import java.util.HashMap;
 import java.util.Vector;

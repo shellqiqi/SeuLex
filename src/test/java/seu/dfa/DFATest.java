@@ -1,4 +1,4 @@
-package seu;
+package seu.dfa;
 
 import org.javatuples.Pair;
 import org.junit.Ignore;

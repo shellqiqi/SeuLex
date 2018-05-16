@@ -1,10 +1,10 @@
-package seu;
+package seu.nfa;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 
-import static seu.NFAUtil.transitionTableDebugMessage;
+import static seu.nfa.NFAUtil.transitionTableDebugMessage;
 
 public class IntegratedNFA {
 
