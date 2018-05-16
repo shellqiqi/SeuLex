@@ -256,6 +256,7 @@ public class NFA {
 
     /**
      * Operation square brackets([]).
+     *
      * @param chars A vector of characters brackets include in.
      * @return NFA with square brackets.
      */
@@ -264,6 +265,25 @@ public class NFA {
         Vector<HashSet<Integer>> startStateRow = initStateRow();
         Vector<HashSet<Integer>> acceptStateRow = initStateRow();
         addTransition(startStateRow, chars, 1);
+        result.transitionTable.add(startStateRow);
+        result.transitionTable.add(acceptStateRow);
+        result.accept = 1;
+        return result;
+    }
+
+    /**
+     * Operation not([^]).
+     *
+     * @param chars A vector of characters brackets include in.
+     * @return NFA without transition of given characters.
+     */
+    public static NFA not(Vector<Character> chars) {
+        NFA result = new NFA(true);
+        Vector<HashSet<Integer>> startStateRow = initStateRow();
+        Vector<HashSet<Integer>> acceptStateRow = initStateRow();
+        for (char i = 0; i < COLUMNS; i++)
+            if (!chars.contains(i))
+                addTransition(startStateRow, i, 1);
         result.transitionTable.add(startStateRow);
         result.transitionTable.add(acceptStateRow);
         result.accept = 1;

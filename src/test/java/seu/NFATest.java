@@ -77,4 +77,16 @@ public class NFATest {
         NFA nfa1 = NFA.square(characters);
         System.out.println(nfa1.debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void not() {
+        Vector<Character> characters = new Vector<>();
+        characters.add('a');
+        characters.add('1');
+        characters.add((char) 0);
+        characters.add(NFA.EPSILON);
+        NFA nfa1 = NFA.not(characters);
+        System.out.println(nfa1.debugMessage());
+    }
 }
