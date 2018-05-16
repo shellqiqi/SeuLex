@@ -242,4 +242,30 @@ public class NFAUtil {
         addTransition(result.transitionTable.elementAt(result.accept - 1), EPSILON, result.accept);
         return result;
     }
+
+    public static String transitionTableDebugMessage(Vector<Vector<HashSet<Integer>>> transitionTable) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < transitionTable.size(); i++) {
+            builder.append(i).append(": ");
+            for (int ch = 0; ch < COLUMNS; ch++) {
+                if (ch >= 32 && ch <= 126) {
+                    builder.append('\'').append((char) ch).append('\'');
+                } else if (ch == 128) {
+                    builder.append("\'ε\'");
+                } else {
+                    builder.append(ch);
+                }
+                builder.append("[");
+                boolean first = true;
+                for (Integer transition : transitionTable.elementAt(i).elementAt(ch)) {
+                    if (!first) builder.append(',');
+                    builder.append(transition);
+                    first = false;
+                }
+                builder.append("] ");
+            }
+            builder.append('\n');
+        }
+        return builder.toString();
+    }
 }
