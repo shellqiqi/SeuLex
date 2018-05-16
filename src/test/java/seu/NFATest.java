@@ -22,9 +22,9 @@ public class NFATest {
     public void concat() throws Exception {
         NFA nfa1 = new NFA('0', '3');
         NFA nfa2 = new NFA('3', '5');
-        NFA nfa3 = NFA.concat(nfa1, nfa2);
+        NFA nfa3 = NFAUtil.concat(nfa1, nfa2);
         System.out.println(nfa3.debugMessage());
-        nfa3 = NFA.concat(nfa3, nfa3);
+        nfa3 = NFAUtil.concat(nfa3, nfa3);
         System.out.println(nfa3.debugMessage());
     }
 
@@ -33,9 +33,9 @@ public class NFATest {
     public void or() throws Exception {
         NFA nfa1 = new NFA('0', '3');
         NFA nfa2 = new NFA('3', '5');
-        NFA nfa3 = NFA.or(nfa1, nfa2);
+        NFA nfa3 = NFAUtil.or(nfa1, nfa2);
         System.out.println(nfa3.debugMessage());
-        nfa3 = NFA.or(nfa3, nfa3);
+        nfa3 = NFAUtil.or(nfa3, nfa3);
         System.out.println(nfa3.debugMessage());
     }
 
@@ -44,9 +44,9 @@ public class NFATest {
     public void star() throws Exception {
         NFA nfa1 = new NFA('0', '3');
         NFA nfa2 = new NFA('3', '5');
-        System.out.println(NFA.star(nfa1).debugMessage());
-        System.out.println(NFA.star(nfa2).debugMessage());
-        System.out.println(NFA.star(new NFA()).debugMessage());
+        System.out.println(NFAUtil.star(nfa1).debugMessage());
+        System.out.println(NFAUtil.star(nfa2).debugMessage());
+        System.out.println(NFAUtil.star(new NFA()).debugMessage());
     }
 
     @Test
@@ -54,15 +54,15 @@ public class NFATest {
     public void plus() throws Exception {
         NFA nfa1 = new NFA('0', '3');
         NFA nfa2 = new NFA('3', '5');
-        System.out.println(NFA.plus(nfa1).debugMessage());
-        System.out.println(NFA.plus(nfa2).debugMessage());
-        System.out.println(NFA.plus(new NFA()).debugMessage());
+        System.out.println(NFAUtil.plus(nfa1).debugMessage());
+        System.out.println(NFAUtil.plus(nfa2).debugMessage());
+        System.out.println(NFAUtil.plus(new NFA()).debugMessage());
     }
 
     @Test
     @Ignore
     public void dot() {
-        NFA nfa1 = NFA.dot();
+        NFA nfa1 = NFAUtil.dot();
         System.out.println(nfa1.debugMessage());
     }
 
@@ -73,8 +73,8 @@ public class NFATest {
         characters.add('a');
         characters.add('1');
         characters.add((char) 0);
-        characters.add(NFA.EPSILON);
-        NFA nfa1 = NFA.square(characters);
+        characters.add(NFAUtil.EPSILON);
+        NFA nfa1 = NFAUtil.square(characters);
         System.out.println(nfa1.debugMessage());
     }
 
@@ -85,8 +85,8 @@ public class NFATest {
         characters.add('a');
         characters.add('1');
         characters.add((char) 0);
-        characters.add(NFA.EPSILON);
-        NFA nfa1 = NFA.not(characters);
+        characters.add(NFAUtil.EPSILON);
+        NFA nfa1 = NFAUtil.not(characters);
         System.out.println(nfa1.debugMessage());
     }
 
@@ -94,7 +94,7 @@ public class NFATest {
     @Ignore
     public void repeat() throws Exception {
         NFA nfa1 = new NFA('0', '3');
-        NFA nfa2 = NFA.repeat(nfa1, 3, 5);
+        NFA nfa2 = NFAUtil.repeat(nfa1, 3, 5);
         System.out.println(nfa2.debugMessage());
     }
 
@@ -103,8 +103,8 @@ public class NFATest {
     public void question() throws Exception {
         NFA nfa1 = new NFA('0', '3');
         NFA nfa2 = new NFA('3', '5');
-        System.out.println(NFA.question(nfa1).debugMessage());
-        System.out.println(NFA.question(nfa2).debugMessage());
-        System.out.println(NFA.question(new NFA()).debugMessage());
+        System.out.println(NFAUtil.question(nfa1).debugMessage());
+        System.out.println(NFAUtil.question(nfa2).debugMessage());
+        System.out.println(NFAUtil.question(new NFA()).debugMessage());
     }
 }
