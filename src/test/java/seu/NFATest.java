@@ -46,4 +46,14 @@ public class NFATest {
         System.out.println(NFA.star(nfa2).debugMessage());
         System.out.println(NFA.star(new NFA()).debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void plus() throws Exception {
+        NFA nfa1 = new NFA('0', '3');
+        NFA nfa2 = new NFA('3', '5');
+        System.out.println(NFA.plus(nfa1).debugMessage());
+        System.out.println(NFA.plus(nfa2).debugMessage());
+        System.out.println(NFA.plus(new NFA()).debugMessage());
+    }
 }

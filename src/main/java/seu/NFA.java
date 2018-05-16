@@ -157,6 +157,10 @@ public class NFA {
         return result;
     }
 
+    public static NFA plus(NFA nfa) {
+        return concat(nfa, star(nfa));
+    }
+
     public String debugMessage() {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < transitionTable.size(); i++) {
