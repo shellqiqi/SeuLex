@@ -1,6 +1,7 @@
 package seu.nfa;
 
 import java.util.HashSet;
+import java.util.Stack;
 import java.util.Vector;
 
 public class NFAUtil {
@@ -9,6 +10,84 @@ public class NFAUtil {
     public final static char EPSILON = 128;
     /* Total columns of transition table */
     public final static int COLUMNS = 129;
+
+    /**
+     * Generate a NFA from a regular expression.
+     *
+     * @param regExp Regular expression.
+     * @return A NFA.
+     */
+    public static NFA regExpToNFA(String regExp) throws Exception {
+        Stack<Character> stack = new Stack<>();
+        Vector<NFA> nfaQuene = new Vector<>();
+        Vector<Character> opQuene = new Vector<>();
+
+        final Character QUATE = 129,    //""
+                        SQUARE = 130;   //[]
+        for (int i = 0; i < regExp.length(); i++) {
+            char ch = regExp.charAt(i);
+            switch (ch) {
+                case '\\':
+                    i++;
+                    if (regExp.charAt(i) == 'r')
+                        stack.push('\r');
+                    if (regExp.charAt(i) == 'n')
+                        stack.push('\n');
+                    if (regExp.charAt(i) == 't')
+                        stack.push('\t');
+                    stack.push(regExp.charAt(i));
+                    break;
+                case '"':
+                    if (stack.search(QUATE) != -1) {
+                        NFA nfa_s = new NFA();
+                        while (!stack.peek().equals(QUATE)) {
+                            nfa_s = concat(new NFA(stack.pop()), nfa_s);
+                        }
+                        stack.pop();
+                        nfaQuene.add(nfa_s);
+
+                    } else {
+                        stack.push(QUATE);
+                    }
+                    break;
+                case '[':
+                    stack.push(SQUARE);
+                    break;
+                case ']':
+                    Vector<Character> chs = new Vector<>();
+                    if (stack.search(SQUARE) != -1) {
+                        NFA nfa_g = null;
+                        while (!stack.peek().equals(SQUARE)) {
+                            Character topChar = stack.pop();
+                            if(stack.peek().equals('-')){
+                                stack.pop();
+                                if(stack.peek().equals(SQUARE))
+                                    chs.add(topChar,'-');
+                                else
+                                    if(nfa_g != null)
+                                        nfa_g = or(new NFA(stack.pop(),topChar), nfa_g);
+                                    else
+                                        nfa_g = new NFA(stack.pop(), topChar);
+                            }
+                        }
+                        stack.pop();
+                        nfaQuene.add(nfa_g);
+
+                    } else {
+                        throw new  Exception("Lex syntax error - [] mismatch");
+                    }
+                    break;
+                    //TODO: add other functional symbols.
+                default:
+                    stack.push(ch);
+            }
+        }
+        if(nfaQuene.size() != 1)
+            throw new Exception("Lex syntax error - Wrong regular expression"
+                                + "with " +nfaQuene.size() + " nfa uncombined");
+        return nfaQuene.elementAt(0);
+    }
+
 
     /**
      * Init a state row with no transition.
