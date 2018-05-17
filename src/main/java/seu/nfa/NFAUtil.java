@@ -295,7 +295,7 @@ public class NFAUtil {
      */
     public static NFA not(Vector<Character> chars) {
         NFA result = new NFA();
-        for (char i = 0; i < COLUMNS; i++)
+        for (char i = 0; i < COLUMNS - 1; i++)
             if (!chars.contains(i))
                 result.addTransition(0, i, 1);
         Vector<HashSet<Integer>> acceptStateRow = initStateRow();
