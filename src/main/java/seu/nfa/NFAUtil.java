@@ -1,5 +1,6 @@
 package seu.nfa;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 import java.util.Vector;
@@ -22,10 +23,15 @@ public class NFAUtil {
         Vector<NFA> nfaQuene = new Vector<>();
         Vector<Character> opQuene = new Vector<>();
 
-        final Character QUATE = 129,    //""
-                        SQUARE = 130;   //[]
+        final Character QUATE = 129,  //""
+                SQUARE = 130,  //[]
+                NOT = 131;  //[^]
+
+        boolean squareLock = false;
+
         for (int i = 0; i < regExp.length(); i++) {
             char ch = regExp.charAt(i);
+
             switch (ch) {
                 case '\\':
                     i++;
@@ -37,7 +43,49 @@ public class NFAUtil {
                         stack.push('\t');
                     stack.push(regExp.charAt(i));
                     break;
+                case '[':
+                    stack.push(SQUARE);
+                    squareLock = true;
+                    break;
+                case '^':
+                    if (stack.peek() == SQUARE) {
+                        stack.pop();
+                        stack.push(NOT);
+                    } else {
+                        stack.push(ch);
+                        break;
+                    }
+                    break;
+                case ']':
+                    Vector<Character> chs = new Vector<>();
+                    if (stack.search(SQUARE) == -1 && stack.search(NOT) == -1)
+                        throw new Exception("Lex syntax error - [] mismatch");
+                    while (!stack.peek().equals(SQUARE) && !stack.peek().equals(NOT)) {
+                        Character topChar = stack.pop();
+                        if (stack.peek().equals('-')) {
+                            stack.pop();
+                            if (stack.peek().equals(SQUARE) || stack.peek().equals(NOT))
+                                chs.add(topChar, '-');
+                            else {
+                                if (stack.peek() > topChar)
+                                    throw new Exception("Lex syntax error - ");
+                                for (char j = stack.pop(); j <= topChar; j++)
+                                    chs.add(j);
+                            }
+                        } else
+                            chs.add(topChar);
+                    }
+                    NFA nfa_g;
+                    if (stack.pop().equals(SQUARE)) nfa_g = square(chs);
+                    else nfa_g = not(chs);
+                    nfaQuene.add(nfa_g);
+
+                    break;
                 case '"':
+                    if (squareLock == true) {
+                        stack.push(ch);
+                        break;
+                    }
                     if (stack.search(QUATE) != -1) {
                         NFA nfa_s = new NFA();
                         while (!stack.peek().equals(QUATE)) {
@@ -50,41 +98,15 @@ public class NFAUtil {
                         stack.push(QUATE);
                     }
                     break;
-                case '[':
-                    stack.push(SQUARE);
-                    break;
-                case ']':
-                    Vector<Character> chs = new Vector<>();
-                    if (stack.search(SQUARE) != -1) {
-                        NFA nfa_g = null;
-                        while (!stack.peek().equals(SQUARE)) {
-                            Character topChar = stack.pop();
-                            if(stack.peek().equals('-')){
-                                stack.pop();
-                                if(stack.peek().equals(SQUARE))
-                                    chs.add(topChar,'-');
-                                else
-                                    if(nfa_g != null)
-                                        nfa_g = or(new NFA(stack.pop(),topChar), nfa_g);
-                                    else
-                                        nfa_g = new NFA(stack.pop(), topChar);
-                            }
-                        }
-                        stack.pop();
-                        nfaQuene.add(nfa_g);
 
-                    } else {
-                        throw new  Exception("Lex syntax error - [] mismatch");
-                    }
-                    break;
-                    //TODO: add other functional symbols.
+                //TODO: add other functional symbols.
                 default:
                     stack.push(ch);
             }
         }
-        if(nfaQuene.size() != 1)
+        if (nfaQuene.size() != 1)
             throw new Exception("Lex syntax error - Wrong regular expression"
-                                + "with " +nfaQuene.size() + " nfa uncombined");
+                    + "with " + nfaQuene.size() + " nfa uncombined");
         return nfaQuene.elementAt(0);
     }
 

@@ -113,8 +113,9 @@ public class NFATest {
     public void regExpToNFA() throws Exception {
         Vector<String> regExps = new Vector<>();
         regExps.add("\"if\"");
-        regExps.add("[a]");
-        NFA nfa1 = NFAUtil.regExpToNFA(regExps.get(1));
+        regExps.add("[a-bd\"AC-F]");
+        regExps.add("[^a-c]");
+        NFA nfa1 = NFAUtil.regExpToNFA(regExps.get(2));
         System.out.println(nfa1.debugMessage());
     }
 }
