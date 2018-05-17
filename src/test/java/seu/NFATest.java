@@ -107,4 +107,14 @@ public class NFATest {
         System.out.println(NFAUtil.question(nfa2).debugMessage());
         System.out.println(NFAUtil.question(new NFA()).debugMessage());
     }
+
+    @Test
+    @Ignore
+    public void regExpToNFA() throws Exception {
+        Vector<String> regExps = new Vector<>();
+        regExps.add("\"if\"");
+        regExps.add("[a]");
+        NFA nfa1 = NFAUtil.regExpToNFA(regExps.get(1));
+        System.out.println(nfa1.debugMessage());
+    }
 }
