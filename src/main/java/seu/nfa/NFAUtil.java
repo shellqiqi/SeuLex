@@ -1,4 +1,4 @@
-package seu;
+package seu.nfa;
 
 import java.util.HashSet;
 import java.util.Stack;
@@ -231,13 +231,9 @@ public class NFAUtil {
      * @return NFA with a dot.
      */
     public static NFA dot() {
-        NFA result = new NFA(true);
-        Vector<HashSet<Integer>> startStateRow = initStateRow();
+        NFA result = new NFA();
+        for (int i = 0; i < COLUMNS - 1; i++) result.addTransition(0, (char) i, 1);
         Vector<HashSet<Integer>> acceptStateRow = initStateRow();
-        for (int i = 0; i < COLUMNS - 1; i++) {
-            addTransition(startStateRow, (char) i, 1);
-        }
-        result.transitionTable.add(startStateRow);
         result.transitionTable.add(acceptStateRow);
         result.accept = 1;
         return result;
@@ -261,11 +257,9 @@ public class NFAUtil {
      * @return NFA with square brackets.
      */
     public static NFA square(Vector<Character> chars) {
-        NFA result = new NFA(true);
-        Vector<HashSet<Integer>> startStateRow = initStateRow();
+        NFA result = new NFA();
+        result.addTransition(0, chars, 1);
         Vector<HashSet<Integer>> acceptStateRow = initStateRow();
-        addTransition(startStateRow, chars, 1);
-        result.transitionTable.add(startStateRow);
         result.transitionTable.add(acceptStateRow);
         result.accept = 1;
         return result;
@@ -278,13 +272,11 @@ public class NFAUtil {
      * @return NFA without transition of given characters.
      */
     public static NFA not(Vector<Character> chars) {
-        NFA result = new NFA(true);
-        Vector<HashSet<Integer>> startStateRow = initStateRow();
-        Vector<HashSet<Integer>> acceptStateRow = initStateRow();
+        NFA result = new NFA();
         for (char i = 0; i < COLUMNS; i++)
             if (!chars.contains(i))
-                addTransition(startStateRow, i, 1);
-        result.transitionTable.add(startStateRow);
+                result.addTransition(0, i, 1);
+        Vector<HashSet<Integer>> acceptStateRow = initStateRow();
         result.transitionTable.add(acceptStateRow);
         result.accept = 1;
         return result;
@@ -328,5 +320,31 @@ public class NFAUtil {
         addTransition(result.transitionTable.firstElement(), EPSILON, startState);
         addTransition(result.transitionTable.elementAt(result.accept - 1), EPSILON, result.accept);
         return result;
+    }
+
+    public static String transitionTableDebugMessage(Vector<Vector<HashSet<Integer>>> transitionTable) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < transitionTable.size(); i++) {
+            builder.append(i).append(": ");
+            for (int ch = 0; ch < COLUMNS; ch++) {
+                if (ch >= 32 && ch <= 126) {
+                    builder.append('\'').append((char) ch).append('\'');
+                } else if (ch == 128) {
+                    builder.append("\'ε\'");
+                } else {
+                    builder.append(ch);
+                }
+                builder.append("[");
+                boolean first = true;
+                for (Integer transition : transitionTable.elementAt(i).elementAt(ch)) {
+                    if (!first) builder.append(',');
+                    builder.append(transition);
+                    first = false;
+                }
+                builder.append("] ");
+            }
+            builder.append('\n');
+        }
+        return builder.toString();
     }
 }

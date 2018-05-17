@@ -1,9 +1,9 @@
-package seu;
+package seu.nfa;
 
 import java.util.HashSet;
 import java.util.Vector;
 
-import static seu.NFAUtil.*;
+import static seu.nfa.NFAUtil.*;
 
 public class NFA {
 
@@ -15,12 +15,8 @@ public class NFA {
     public int accept;
 
     public NFA() {
-        this(false);
-    }
-
-    public NFA(boolean emptyTable) {
         accept = 0;
-        if (!emptyTable) transitionTable.add(initStateRow());
+        transitionTable.add(initStateRow());
     }
 
     public NFA(char ch) {
@@ -94,29 +90,6 @@ public class NFA {
      * @return String of the message.
      */
     public String debugMessage() {
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < transitionTable.size(); i++) {
-            buffer.append(i).append(": ");
-            for (int ch = 0; ch < COLUMNS; ch++) {
-                if (ch >= 32 && ch <= 126) {
-                    buffer.append('\'').append((char) ch).append('\'');
-                } else if (ch == 128) {
-                    buffer.append("\'ε\'");
-                } else {
-                    buffer.append(ch);
-                }
-                buffer.append("[");
-                boolean first = true;
-                for (Integer transition : transitionTable.elementAt(i).elementAt(ch)) {
-                    if (!first) buffer.append(',');
-                    buffer.append(transition);
-                    first = false;
-                }
-                buffer.append("] ");
-            }
-            buffer.append('\n');
-        }
-        buffer.append("accept: ").append(accept).append('\n');
-        return buffer.toString();
+        return transitionTableDebugMessage(transitionTable) + "accept: " + accept + '\n';
     }
 }

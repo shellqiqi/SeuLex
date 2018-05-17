@@ -1,8 +1,9 @@
-package seu;
+package seu.io;
 
 import org.javatuples.Pair;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import seu.io.LexFile;
 
 import java.util.HashMap;
 import java.util.Vector;
