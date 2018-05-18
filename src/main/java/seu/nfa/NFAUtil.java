@@ -19,15 +19,38 @@ public class NFAUtil {
      * @return A NFA.
      */
     public static NFA regExpToNFA(String regExp) throws Exception {
-        Stack<Character> stack = new Stack<>();
-        Vector<NFA> nfaQuene = new Vector<>();
-        Vector<Character> opQuene = new Vector<>();
+        Stack<Object> nfaStack = new Stack<>();
+        Vector<Object> nfaQuene_infix = regExpTosubNFAs(regExp);
+        Vector<Object> nfaQuene_suffix = new Vector<>();
+
+        nfaStack.push('#');
+        for (int i = 0; i < nfaQuene_infix.size(); i++) {
+            Object obj = nfaQuene_infix.get(i);
+            if(obj.getClass().equals(NFA.class)){
+                nfaQuene_suffix.add(obj);
+            }
+        }
+        if (nfaQuene_infix.size() != 1)
+            throw new Exception("Lex syntax error - Wrong regular expression");
+        return (NFA) nfaQuene_infix.elementAt(0);
+    }
+
+    /**
+     *Replace the atomic expression in regular expression with a sub Nfa.
+     *
+     * @param regExp
+     * @return a vector consist of atomic operations    (|,*,+,?)
+     *                          and atomic expressions  ([],"",[^] and common characters)
+     */
+    private static Vector<Object> regExpTosubNFAs(String regExp) throws Exception {
+        Stack<Character> charStack = new Stack<>();
+        Vector<Object> nfaQuene = new Vector<>();
 
         final Character QUATE = 129,  //""
                 SQUARE = 130,  //[]
                 NOT = 131;  //[^]
 
-        boolean squareLock = false;
+        Character lock = null;
 
         for (int i = 0; i < regExp.length(); i++) {
             char ch = regExp.charAt(i);
@@ -36,78 +59,77 @@ public class NFAUtil {
                 case '\\':
                     i++;
                     if (regExp.charAt(i) == 'r')
-                        stack.push('\r');
+                        charStack.push('\r');
                     if (regExp.charAt(i) == 'n')
-                        stack.push('\n');
+                        charStack.push('\n');
                     if (regExp.charAt(i) == 't')
-                        stack.push('\t');
-                    stack.push(regExp.charAt(i));
+                        charStack.push('\t');
+                    charStack.push(regExp.charAt(i));
                     break;
                 case '[':
-                    stack.push(SQUARE);
-                    squareLock = true;
+                    charStack.push(SQUARE);
+                    lock = SQUARE;
                     break;
                 case '^':
-                    if (stack.peek() == SQUARE) {
-                        stack.pop();
-                        stack.push(NOT);
-                    } else {
-                        stack.push(ch);
-                        break;
-                    }
+                    if (charStack.peek() == SQUARE) {
+                        charStack.pop();
+                        charStack.push(NOT);
+                        lock = NOT;
+                    } else
+                        charStack.push(ch);
                     break;
                 case ']':
                     Vector<Character> chs = new Vector<>();
-                    if (stack.search(SQUARE) == -1 && stack.search(NOT) == -1)
+                    if (charStack.search(SQUARE) == -1 && charStack.search(NOT) == -1)
                         throw new Exception("Lex syntax error - [] mismatch");
-                    while (!stack.peek().equals(SQUARE) && !stack.peek().equals(NOT)) {
-                        Character topChar = stack.pop();
-                        if (stack.peek().equals('-')) {
-                            stack.pop();
-                            if (stack.peek().equals(SQUARE) || stack.peek().equals(NOT))
+                    while (!charStack.peek().equals(SQUARE) && !charStack.peek().equals(NOT)) {
+                        Character topChar = charStack.pop();
+                        if (charStack.peek().equals('-')) {
+                            charStack.pop();
+                            if (charStack.peek().equals(SQUARE) || charStack.peek().equals(NOT))
                                 chs.add(topChar, '-');
                             else {
-                                if (stack.peek() > topChar)
+                                if (charStack.peek() > topChar)
                                     throw new Exception("Lex syntax error - ");
-                                for (char j = stack.pop(); j <= topChar; j++)
+                                for (char j = charStack.pop(); j <= topChar; j++)
                                     chs.add(j);
                             }
                         } else
                             chs.add(topChar);
                     }
                     NFA nfa_g;
-                    if (stack.pop().equals(SQUARE)) nfa_g = square(chs);
+                    if (charStack.pop().equals(SQUARE)) nfa_g = square(chs);
                     else nfa_g = not(chs);
                     nfaQuene.add(nfa_g);
+                    lock = null;
 
                     break;
                 case '"':
-                    if (squareLock == true) {
-                        stack.push(ch);
+                    if (lock == SQUARE || lock == NOT) {
+                        charStack.push(ch);
                         break;
                     }
-                    if (stack.search(QUATE) != -1) {
+                    if (charStack.search(QUATE) != -1) {
                         NFA nfa_s = new NFA();
-                        while (!stack.peek().equals(QUATE)) {
-                            nfa_s = concat(new NFA(stack.pop()), nfa_s);
+                        while (!charStack.peek().equals(QUATE)) {
+                            nfa_s = concat(new NFA(charStack.pop()), nfa_s);
                         }
-                        stack.pop();
+                        charStack.pop();
                         nfaQuene.add(nfa_s);
-
+                        lock = null;
                     } else {
-                        stack.push(QUATE);
+                        charStack.push(QUATE);
+                        lock = '"';
                     }
                     break;
 
                 //TODO: add other functional symbols.
                 default:
-                    stack.push(ch);
+                    if(lock ==null) nfaQuene.add(ch);
+                    else  charStack.push(ch);
             }
         }
-        if (nfaQuene.size() != 1)
-            throw new Exception("Lex syntax error - Wrong regular expression"
-                    + "with " + nfaQuene.size() + " nfa uncombined");
-        return nfaQuene.elementAt(0);
+        return nfaQuene;
     }
 
 
