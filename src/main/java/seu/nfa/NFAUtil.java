@@ -20,19 +20,29 @@ public class NFAUtil {
      */
     public static NFA regExpToNFA(String regExp) throws Exception {
         Stack<Object> nfaStack = new Stack<>();
-        Vector<Object> nfaQuene_infix = regExpTosubNFAs(regExp);
-        Vector<Object> nfaQuene_suffix = new Vector<>();
+        Vector<Object> nfaQueue_infix = regExpTosubNFAs(regExp);
+        Vector<Object> nfaQueue_suffix = new Vector<>();
 
-        nfaStack.push('#');
-        for (int i = 0; i < nfaQuene_infix.size(); i++) {
-            Object obj = nfaQuene_infix.get(i);
+        final Character BOTTOM = 10000;
+        HashMap<Character, Integer> priorityTable= new HashMap<>();
+        priorityTable.put(BOTTOM, 0);
+        priorityTable.put('(',1);
+        priorityTable.put('|',2);
+        priorityTable.put('*',3);
+        priorityTable.put('+',3);
+        priorityTable.put('?',3);
+
+        nfaStack.push(BOTTOM);
+        for (int i = 0; i < nfaQueue_infix.size(); i++) {
+            Object obj = nfaQueue_infix.get(i);
             if(obj.getClass().equals(NFA.class)){
-                nfaQuene_suffix.add(obj);
+                nfaQueue_suffix.add(obj);
             }
+            //TODO:
         }
-        if (nfaQuene_infix.size() != 1)
+        if (nfaQueue_infix.size() != 1)
             throw new Exception("Lex syntax error - Wrong regular expression");
-        return (NFA) nfaQuene_infix.elementAt(0);
+        return (NFA) nfaQueue_infix.elementAt(0);
     }
 
     /**
@@ -44,7 +54,7 @@ public class NFAUtil {
      */
     private static Vector<Object> regExpTosubNFAs(String regExp) throws Exception {
         Stack<Character> charStack = new Stack<>();
-        Vector<Object> nfaQuene = new Vector<>();
+        Vector<Object> nfaQueue = new Vector<>();
 
         final Character QUATE = 129,  //""
                 SQUARE = 130,  //[]
@@ -100,7 +110,7 @@ public class NFAUtil {
                     NFA nfa_g;
                     if (charStack.pop().equals(SQUARE)) nfa_g = square(chs);
                     else nfa_g = not(chs);
-                    nfaQuene.add(nfa_g);
+                    nfaQueue.add(nfa_g);
                     lock = null;
 
                     break;
@@ -115,21 +125,25 @@ public class NFAUtil {
                             nfa_s = concat(new NFA(charStack.pop()), nfa_s);
                         }
                         charStack.pop();
-                        nfaQuene.add(nfa_s);
+                        nfaQueue.add(nfa_s);
                         lock = null;
                     } else {
                         charStack.push(QUATE);
                         lock = '"';
                     }
                     break;
-
+                case '.':
+                    if(lock !=null) nfaQueue.add(ch);
+                    else  nfaQueue.add(dot());
+                    break;
                 //TODO: add other functional symbols.
                 default:
-                    if(lock ==null) nfaQuene.add(ch);
+                    if(lock ==null) nfaQueue.add(ch);
                     else  charStack.push(ch);
+                    break;
             }
         }
-        return nfaQuene;
+        return nfaQueue;
     }
 
 
