@@ -12,8 +12,8 @@ public class NFAUtil {
     /* Total columns of transition table */
     public final static int COLUMNS = 129;
     /* Definition of regular operators*/
-    private final static int BOTTOM = 10000;
-    private final static int CONCAT = 10001;
+    private final static Character BOTTOM = 10000;
+    private final static Character CONCAT = 10001;
 
     /**
      * Generate a NFA from a regular expression.
@@ -22,18 +22,20 @@ public class NFAUtil {
      * @return A NFA.
      */
     public static NFA regExpToNFA(String regExp) throws Exception {
-        Stack<Character> opStack = new Stack<>();//stack for operations
-        Vector<Object> nfaQueue_infix = regExpTosubNFAs(regExp);
-        Vector<Object> nfaQueue_suffix = new Vector<>();
-
-        final Character BOTTOM = 10000;
         HashMap<Character, Integer> priorityTable = new HashMap<>();
         priorityTable.put(BOTTOM, 0);
         priorityTable.put('(', 1);
         priorityTable.put('|', 2);
-        priorityTable.put('*', 3);
-        priorityTable.put('+', 3);
-        priorityTable.put('?', 3);
+        priorityTable.put(CONCAT, 3);
+        priorityTable.put('*', 4);
+        priorityTable.put('+', 4);
+        priorityTable.put('?', 4);
+        priorityTable.put(')', 5);
+
+        Stack<Character> opStack = new Stack<>();//stack for operations
+        Vector<Object> nfaQueue_infix = regExpToSubNFAs(regExp, priorityTable);
+        addConcatForNFAs(nfaQueue_infix);
+        Vector<Object> nfaQueue_suffix = new Vector<>();
 
         opStack.push(BOTTOM);
         for (int i = 0; i < nfaQueue_infix.size(); i++) {
@@ -42,25 +44,58 @@ public class NFAUtil {
                 nfaQueue_suffix.add(obj);
             } else {
                 Character op = (Character) obj;
-                if (priorityTable.get(op) > priorityTable.get(opStack.peek())) {
-                    if (op == ')') {
-                        while (opStack.peek() != '(') {
-                            nfaQueue_suffix.add(opStack.pop());
-                        }
-                        opStack.pop();
-                    } else
-                        nfaQueue_suffix.add(op);
-                } else
+                if (op == '(')
+                    opStack.push(op);
+                else if (op == ')') {
+                    while (!opStack.peek().equals('(')) {
+                        nfaQueue_suffix.add(opStack.pop());
+                    }
+                    opStack.pop();
+                } else if (priorityTable.get(op) <= priorityTable.get(opStack.peek())) {
+                    nfaQueue_suffix.add(opStack.pop());
+                    opStack.push(op);
+                } else if (priorityTable.get(op) == -1)
+                    nfaQueue_suffix.add(op);
+                else
                     opStack.push(op);
             }
-            //TODO:
         }
-        while(!opStack.empty()){
+        while (!opStack.empty()) {
             nfaQueue_suffix.add(opStack.pop());
         }
-        if (nfaQueue_suffix.size() != 2)
+
+        Stack<NFA> nfaStack = new Stack<>();
+        for (int i = 0; i < nfaQueue_suffix.size(); i++) {
+            Object obj = nfaQueue_suffix.get(i);
+            if (obj.getClass().equals(NFA.class)) {
+                nfaStack.push((NFA) obj);
+            } else {
+                Character op = (Character) obj;
+                if (op.equals(CONCAT)) {
+                    NFA right = nfaStack.pop();
+                    nfaStack.push(concat(nfaStack.pop(), right));
+                } else {
+                    switch (op) {
+                        case '*':
+                            nfaStack.push(star(nfaStack.pop()));
+                            break;
+                        case '?':
+                            nfaStack.push(question(nfaStack.pop()));
+                            break;
+                        case '+':
+                            nfaStack.push(plus(nfaStack.pop()));
+                            break;
+                        case '|':
+                            nfaStack.push(or(nfaStack.pop(), nfaStack.pop()));
+                            break;
+                    }
+                }
+            }
+        }
+
+        if (nfaStack.size() != 1)
             throw new Exception("Lex syntax error - Wrong regular expression");
-        return (NFA) nfaQueue_suffix.elementAt(0);
+        return nfaStack.pop();
     }
 
     /**
@@ -70,7 +105,7 @@ public class NFAUtil {
      * @return a vector consist of atomic operations    (|,*,+,?)
      * and atomic expressions  ([],"",[^] and common characters)
      */
-    private static Vector<Object> regExpTosubNFAs(String regExp) throws Exception {
+    private static Vector<Object> regExpToSubNFAs(String regExp, HashMap<Character, Integer> priorityTable) throws Exception {
         Stack<Character> charStack = new Stack<>();
         Vector<Object> nfaQueue = new Vector<>();
 
@@ -82,17 +117,40 @@ public class NFAUtil {
 
         for (int i = 0; i < regExp.length(); i++) {
             char ch = regExp.charAt(i);
+            if (lock != null) {
+                if (lock == QUATE) {
+                    if (ch != '"' && ch != '\\') {
+                        charStack.push(ch);
+                        continue;
+                    }
+                }
 
+                if (lock == SQUARE) {
+                    if (ch != '^' && ch != '\\' && ch != ']') {
+                        charStack.push(ch);
+                        continue;
+                    }
+                }
+                if (lock == NOT) {
+                    if (ch != '\\' && ch != ']') {
+                        charStack.push(ch);
+                        continue;
+                    }
+                }
+            }
             switch (ch) {
                 case '\\':
                     i++;
-                    if (regExp.charAt(i) == 'r')
-                        charStack.push('\r');
-                    if (regExp.charAt(i) == 'n')
-                        charStack.push('\n');
-                    if (regExp.charAt(i) == 't')
-                        charStack.push('\t');
-                    charStack.push(regExp.charAt(i));
+                    if (lock != null) {
+                        if (regExp.charAt(i) == 'r')
+                            charStack.push('\r');
+                        if (regExp.charAt(i) == 'n')
+                            charStack.push('\n');
+                        if (regExp.charAt(i) == 't')
+                            charStack.push('\t');
+                        charStack.push(regExp.charAt(i));
+                    } else
+                        nfaQueue.add(new NFA(regExp.charAt(i)));
                     break;
                 case '[':
                     charStack.push(SQUARE);
@@ -110,11 +168,11 @@ public class NFAUtil {
                     Vector<Character> chs = new Vector<>();
                     if (charStack.search(SQUARE) == -1 && charStack.search(NOT) == -1)
                         throw new Exception("Lex syntax error - [] mismatch");
-                    while (!charStack.peek().equals(SQUARE) && !charStack.peek().equals(NOT)) {
+                    while (!charStack.peek().equals(lock)) {
                         Character topChar = charStack.pop();
                         if (charStack.peek().equals('-')) {
                             charStack.pop();
-                            if (charStack.peek().equals(SQUARE) || charStack.peek().equals(NOT))
+                            if (charStack.peek().equals(lock))
                                 chs.add(topChar, '-');
                             else {
                                 if (charStack.peek() > topChar)
@@ -133,10 +191,6 @@ public class NFAUtil {
 
                     break;
                 case '"':
-                    if (lock == SQUARE || lock == NOT) {
-                        charStack.push(ch);
-                        break;
-                    }
                     if (charStack.search(QUATE) != -1) {
                         NFA nfa_s = new NFA();
                         while (!charStack.peek().equals(QUATE)) {
@@ -147,17 +201,17 @@ public class NFAUtil {
                         lock = null;
                     } else {
                         charStack.push(QUATE);
-                        lock = '"';
+                        lock = QUATE;
                     }
                     break;
                 case '.':
-                    if (lock != null) nfaQueue.add(ch);
-                    else nfaQueue.add(dot());
+                    nfaQueue.add(dot());
                     break;
-                //TODO: add other functional symbols.
                 default:
-                    if (lock == null) nfaQueue.add(ch);
-                    else charStack.push(ch);
+                    if (priorityTable.containsKey(ch))
+                        nfaQueue.add(ch);
+                    else
+                        nfaQueue.add(new NFA(ch));
                     break;
             }
         }
@@ -170,7 +224,22 @@ public class NFAUtil {
      * @param nfaQueue nfas generated by function regExpTosubNFAs
      */
     private static void addConcatForNFAs(Vector<Object> nfaQueue) {
-        //TODO: add .s
+        boolean flag = false;
+        for (int i = 0; i < nfaQueue.size(); i++) {
+            if (nfaQueue.get(i).getClass().equals(NFA.class)) {
+                if (flag)
+                    nfaQueue.insertElementAt(CONCAT, i++);
+                flag = true;
+            } else {
+                Character op = (Character) nfaQueue.get(i);
+                if (flag && op.equals('('))
+                    nfaQueue.insertElementAt(CONCAT, i++);
+                if (op.equals('*') || op.equals('?') || op.equals('+') || op.equals(')'))
+                    flag = true;
+                else
+                    flag = false;
+            }
+        }
     }
 
     /**

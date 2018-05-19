@@ -115,8 +115,15 @@ public class NFATest {
         regExps.add("\"if\"");
         regExps.add("[a-bd\"AC-F]");
         regExps.add("[^a-c]");
+        regExps.add("\"...\"");
         regExps.add(".");
-        NFA nfa1 = NFAUtil.regExpToNFA(regExps.get(3));
+        regExps.add("a|b*");
+        regExps.add("[a-zA-Z_]?\\\"(\\\\.|[^\\\\\"])*\\\"");
+        regExps.add("(a|\"[(]\")*");
+        regExps.add("[a|b(]+\"+\"");
+        regExps.add("a+?");
+        regExps.add("(a(a*))*");
+        NFA nfa1 = NFAUtil.regExpToNFA(regExps.get(10));
         System.out.println(nfa1.debugMessage());
     }
 }
