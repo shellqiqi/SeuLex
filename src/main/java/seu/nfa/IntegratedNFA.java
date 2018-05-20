@@ -1,5 +1,7 @@
 package seu.nfa;
 
+import org.javatuples.Pair;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -18,6 +20,12 @@ public class IntegratedNFA {
     public IntegratedNFA() {
         Vector<HashSet<Integer>> startStateRow = NFAUtil.initStateRow();
         transitionTable.add(startStateRow);
+    }
+
+    public IntegratedNFA(Vector<Pair<String, String>> regExps) throws Exception {
+        for (Pair<String, String> regExp : regExps) {
+            integrate(NFAUtil.regExpToNFA(regExp.getValue0()), regExp.getValue1());
+        }
     }
 
     public void integrate(NFA nfa, String action) {
