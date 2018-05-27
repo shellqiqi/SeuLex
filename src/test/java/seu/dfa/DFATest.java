@@ -1,19 +1,19 @@
 package seu.dfa;
 
-
 import org.junit.Ignore;
 import org.junit.Test;
 import seu.nfa.IntegratedNFA;
 import seu.nfa.NFA;
 import seu.nfa.NFAUtil;
 
+import javax.swing.plaf.PanelUI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
 public class DFATest {
 
-    @Test
+/*    @Test
     @Ignore
     public void getClosureTableByNFA() throws Exception {
         IntegratedNFA nfa = new IntegratedNFA();
@@ -21,6 +21,15 @@ public class DFATest {
         TreeSet t = DFA.getClosureTableByNFA(nfa, 0);
         System.out.println(nfa.debugMessage());
         System.out.println(t.toString());
+    }*/
+
+    @Test
+    @Ignore
+    public void integratedNFAtoDFA() throws Exception {
+        IntegratedNFA nfa = new IntegratedNFA();
+        nfa.integrate(NFAUtil.regExpToNFA("[a-zA-Z_]?\\\"(\\\\.|[^\\\\\"])*\\\""), "");
+        DFA dfa = DFAUtil.integratedNFAtoDFA(nfa);
+        dfa.debugMessage();
     }
 
 }

@@ -6,6 +6,8 @@ import seu.nfa.NFAUtil;
 
 import java.util.*;
 
+import static seu.nfa.NFAUtil.transitionTableDebugMessage;
+
 public class DFA {
 
     /* The transition table of the DFA */
@@ -27,7 +29,7 @@ public class DFA {
         fillActionTable(nfa);
     }
 
-    public static TreeSet<Integer> getClosureTableByNFA(IntegratedNFA nfa, int stateOfNFA) {
+    private TreeSet<Integer> getClosureTableByNFA(IntegratedNFA nfa, int stateOfNFA) {
         TreeSet<Integer> result = new TreeSet<>();
         Stack<Integer> stack = new Stack<>();
         result.add(0);
@@ -83,5 +85,10 @@ public class DFA {
             }
         }
     }
+
+    public String debugMessage() {
+        return DFAUtil.transitionTableDebugMessage(transitionTable) + "accept: " + acceptAction.keySet().toString() + '\n';
+    }
+
 
 }
