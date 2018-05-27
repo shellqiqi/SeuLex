@@ -14,6 +14,15 @@ public class DFAUtil {
         return new DFA(nfa);
     }
 
+    /**
+     * Minimize a DFA
+     *
+     * @param dfa a DFA to be minimized
+     */
+    public void minimizeDFA(DFA dfa){
+        //TODO: Finish the function
+    }
+
     public static String transitionTableDebugMessage(Vector<Vector<Integer>> transitionTable) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < transitionTable.size(); i++) {

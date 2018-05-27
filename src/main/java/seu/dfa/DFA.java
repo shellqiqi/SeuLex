@@ -93,7 +93,7 @@ public class DFA {
         Vector<Integer> rowOfTransitionTable = new Vector<>();
 
         for (char i = 0; i < DFAUtil.COLUMNS; i++) {
-            TreeSet<Integer> dfaState = new TreeSet<>(moveByNFA(nfa, closureTable.get(stateOfDFA),i));
+            TreeSet<Integer> dfaState = new TreeSet<>(moveByNFA(nfa, closureTable.get(stateOfDFA),i));// == nfa states
             if(dfaState.isEmpty()){
                 rowOfTransitionTable.add(-1);
                 continue;
