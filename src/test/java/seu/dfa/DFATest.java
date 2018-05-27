@@ -6,10 +6,7 @@ import seu.nfa.IntegratedNFA;
 import seu.nfa.NFA;
 import seu.nfa.NFAUtil;
 
-import javax.swing.plaf.PanelUI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.Vector;
 
 public class DFATest {
 
@@ -26,10 +23,15 @@ public class DFATest {
     @Test
     @Ignore
     public void integratedNFAtoDFA() throws Exception {
-        IntegratedNFA nfa = new IntegratedNFA();
-        nfa.integrate(NFAUtil.regExpToNFA("[a-zA-Z_]?\\\"(\\\\.|[^\\\\\"])*\\\""), "");
-        DFA dfa = DFAUtil.integratedNFAtoDFA(nfa);
-        dfa.debugMessage();
+        Vector<NFA> nfas = new Vector<>();
+        nfas.add(NFAUtil.regExpToNFA("\"if\""));
+        nfas.add(NFAUtil.regExpToNFA("iff*"));
+        IntegratedNFA infa = new IntegratedNFA();
+        infa.integrate(nfas.get(0), "if");
+        infa.integrate(nfas.get(1), "iff*");
+        DFA dfa = DFAUtil.integratedNFAtoDFA(infa);
+        System.out.println(infa.debugMessage());
+        System.out.println(dfa.debugMessage());
     }
 
 }

@@ -25,7 +25,8 @@ public class DFAUtil {
                     builder.append(ch);
                 }
                 builder.append("[");
-                builder.append(transitionTable.elementAt(i).elementAt(ch));
+                if(transitionTable.elementAt(i).elementAt(ch) >= 0)
+                    builder.append(transitionTable.elementAt(i).elementAt(ch));
                 builder.append("] ");
             }
             builder.append('\n');
