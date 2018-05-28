@@ -34,7 +34,7 @@ public class DFAUtil {
                     builder.append(ch);
                 }
                 builder.append("[");
-                if(transitionTable.elementAt(i).elementAt(ch) >= 0)
+                if(transitionTable.elementAt(i).elementAt(ch) != null)
                     builder.append(transitionTable.elementAt(i).elementAt(ch));
                 builder.append("] ");
             }
