@@ -24,10 +24,17 @@ public class DFAUtil {
     }
 
     public static String transitionTableDebugMessage(Vector<Vector<Integer>> transitionTable) {
+        return transitionTableDebugMessage(transitionTable, false);
+    }
+
+    public static String transitionTableDebugMessage(Vector<Vector<Integer>> transitionTable, boolean verbose) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < transitionTable.size(); i++) {
             builder.append(i).append(": ");
             for (int ch = 0; ch < COLUMNS; ch++) {
+                if(!verbose)
+                    if(transitionTable.elementAt(i).elementAt(ch) == null)
+                        continue;
                 if (ch >= 32 && ch <= 126) {
                     builder.append('\'').append((char) ch).append('\'');
                 } else {
