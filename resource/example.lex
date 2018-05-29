@@ -16,5 +16,5 @@ if        {return IF;}
 {integer} {return INTEGER;}
 %%
 int main() {
-    std::cout << "hello world" << std::endl;
+	while (yylex(cin)>=0) ;
 }

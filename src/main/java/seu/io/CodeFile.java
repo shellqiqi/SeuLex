@@ -20,7 +20,7 @@ public class CodeFile {
     public void writeFile(String filePath) throws IOException {
         writer = new BufferedWriter(new FileWriter(filePath));
         writeHeaders();
-        //TODO: generate static code and DFA transitionTable.
+        writer.write(CodeFileUtilKt.generate(dfa));
         writeUserSeg();
     }
 
