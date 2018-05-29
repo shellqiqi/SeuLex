@@ -14,13 +14,11 @@ public class DFATest {
     @Ignore
     public void integratedNFAtoDFA() throws Exception {
         Vector<NFA> nfas = new Vector<>();
-        nfas.add(NFAUtil.regExpToNFA("\"if\""));
-        nfas.add(NFAUtil.regExpToNFA("iff*"));
-        nfas.add(NFAUtil.regExpToNFA("[a-zA-Z_]?\\\"(\\\\.|[^\\\\\"])*\\\""));
+        nfas.add(NFAUtil.regExpToNFA("i*f"));
+        nfas.add(NFAUtil.regExpToNFA("if*"));
         IntegratedNFA infa = new IntegratedNFA();
-        //infa.integrate(nfas.get(0), "if");
-        //infa.integrate(nfas.get(1), "iff*");
-        infa.integrate(nfas.get(2), "string");
+        infa.integrate(nfas.elementAt(0), "printf(\"i*f\\n\");");
+        infa.integrate(nfas.elementAt(1), "printf(\"if*\\n\");");
         DFA dfa = DFAUtil.integratedNFAtoDFA(infa);
         System.out.println(infa.debugMessage());
         System.out.println(dfa.debugMessage());
