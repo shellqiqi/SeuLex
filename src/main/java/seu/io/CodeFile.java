@@ -22,6 +22,7 @@ public class CodeFile {
         writeHeaders();
         writer.write(CodeFileUtilKt.generate(dfa));
         writeUserSeg();
+        writer.close();
     }
 
     private void writeHeaders() throws IOException {
