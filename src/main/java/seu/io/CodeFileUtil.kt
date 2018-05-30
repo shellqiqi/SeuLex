@@ -10,13 +10,13 @@ fun generate(dfa: DFA): String {
         #include <unordered_map>
         using namespace std;
         string yytext;
-        char current;
+        unsigned int yylength;
         """.trimIndent()
     return head + '\n' +
             transitionTable(dfa) + '\n' +
             acceptFunctions(dfa) + '\n' +
             actionMap(dfa) + '\n' +
-            yylex()
+            yylex() + '\n'
 }
 
 fun acceptFunctions(dfa: DFA): String {
@@ -30,6 +30,12 @@ fun acceptFunctions(dfa: DFA): String {
             """.trimIndent())
         builder.append('\n')
     }
+    builder.append("""
+        int acceptDefault() {
+            cout << yytext << ":unknown" << endl;
+            return 0;
+        }
+    """.trimIndent())
     return builder.toString()
 }
 
@@ -47,25 +53,33 @@ fun yylex(): String { // TODO: logic error here!!!
     return """
         int yylex(istream& in) {
             int state = 0;
-            current = in.get();
+            char nextChar;
             yytext = "";
-            if (current == EOF) return -1;
-            while (transitionTable[state][current] != -1) {
-                yytext.push_back(current);
-                state = transitionTable[state][current];
-                current = in.get();
-            }
-            if (actionMap.find(state) == actionMap.end()) {
-                for (size_t i = 0; i < yytext.length(); i++)
-                {
-                    in.unget();
+            yylength = 0;
+            int lastAccept = -1;
+            unsigned int lastLength = 0;
+
+            while (true) {
+                nextChar = in.get();
+                if (nextChar == EOF) return -1;
+                state = transitionTable[state][nextChar];
+                yytext.push_back(nextChar);
+                yylength++;
+                if (actionMap.find(state) != actionMap.end()) {
+                    lastAccept = state;
+                    lastLength = yylength;
                 }
-                yytext.push_back(current);
-                defaultAction();
-            }
-            else {
-                in.unget();
-                return actionMap.at(state)();
+                if (state == -1) {
+                    while (yylength > lastLength + (lastAccept == -1)) {
+                        in.unget();
+                        yytext.pop_back();
+                        yylength--;
+                    }
+                    if (lastAccept == -1)
+                        return acceptDefault();
+                    else
+                        return actionMap.at(lastAccept)();
+                }
             }
             return 0;
         }

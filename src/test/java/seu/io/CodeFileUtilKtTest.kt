@@ -23,8 +23,8 @@ class CodeFileUtilKtTest {
             nfas.add(NFAUtil.regExpToNFA("i*f"))
             nfas.add(NFAUtil.regExpToNFA("if*"))
             val infa = IntegratedNFA()
-            infa.integrate(nfas[0], "printf(\"i*f\\n\");")
-            infa.integrate(nfas[1], "printf(\"if*\\n\");")
+            infa.integrate(nfas[0], "cout << yytext << \" i*f\" << endl;")
+            infa.integrate(nfas[1], "cout << yytext << \" if*\" << endl;")
             dfa = DFAUtil.integratedNFAtoDFA(infa)
         }
     }
