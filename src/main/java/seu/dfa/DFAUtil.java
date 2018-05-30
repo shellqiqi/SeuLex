@@ -2,7 +2,6 @@ package seu.dfa;
 
 import seu.nfa.IntegratedNFA;
 
-import java.util.HashSet;
 import java.util.Vector;
 
 public class DFAUtil {
