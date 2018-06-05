@@ -75,6 +75,12 @@ public class DFAUtil {
         }
         Divider<Integer> statesDivider = new Divider<>(allSet, acceptSet::contains);
 
+        for (int i = 1; i < statesDivider.size(); i++) {
+            int state = (int) statesDivider.deviderSets.get(i).toArray()[0];
+            statesDivider.devideAt(i, s ->
+                    dfa.acceptAction.get(state).equals(dfa.acceptAction.get(s)));
+        }
+
         while (divide < statesDivider.size()) {
             divide = statesDivider.size();
             for (int i = 0; i < statesDivider.size(); i++) {
@@ -91,19 +97,19 @@ public class DFAUtil {
     public static DFA deleteStatesDuplicated(DFA dfa, Vector<Set<Integer>> deviderSets) {
         /* Key is state of origin dfa, value is a corresponding state of new dfa */
         HashMap<Integer, Integer> toReplace = new HashMap<>();
+        /* States of origin dfa which we use to generate a new dfa */
+        ArrayList<Integer> statesRemained = new ArrayList<>();
 
         int index = 0;
         for (Set<Integer> set : deviderSets) {
             for (Integer i : set) {
                 toReplace.put(i, index);
             }
+            statesRemained.add(Collections.min(set));
             index++;
         }
+        int start = toReplace.get(dfa.start);
 
-        /* States of origin dfa which we use to generate a new dfa */
-        ArrayList<Integer> statesRemained = new ArrayList<>(toReplace.values());
-        int start = toReplace.get(DFA.start);
-        //TODO: fix the logical problem
         Vector<Vector<Integer>> newTable = new Vector<>();
         HashMap<Integer, String> newAction = new HashMap<>();
         for (Integer state : statesRemained) {
@@ -113,14 +119,11 @@ public class DFAUtil {
                 else newRow.add(null);
             }
             newTable.add(newRow);
+            //TODO: Make Sure action conflict when dfa accept state combines makes no sense
             if (dfa.acceptAction.containsKey(state))
                 newAction.put(toReplace.get(state), dfa.acceptAction.get(state));
         }
         return new DFA(newTable, newAction, start);
-    }
-
-    private static void deleteStatesDuplicated(DFA dfa) {
-
     }
 
     public static String transitionTableDebugMessage(Vector<Vector<Integer>> transitionTable) {
