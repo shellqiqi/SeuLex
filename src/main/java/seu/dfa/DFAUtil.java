@@ -29,23 +29,23 @@ public class DFAUtil {
         }
         int divide = 1;
         class Divider<T> {
-            private Vector<Set<T>> deviderSets = new Vector<>();
+            private Vector<Set<T>> dividerSets = new Vector<>();
 
             private Divider(Set<T> set, Predicate<T> filter) {
-                deviderSets.add(set);
-                devideAt(0, filter);
+                dividerSets.add(set);
+                divideAt(0, filter);
             }
 
-            private int devideAt(int i, Predicate<T> filter) {
-                Pair<Set<T>, Set<T>> pair = devide(deviderSets.get(i), filter);
+            private int divideAt(int i, Predicate<T> filter) {
+                Pair<Set<T>, Set<T>> pair = divide(dividerSets.get(i), filter);
                 if (pair.getKey().isEmpty() || pair.getValue().isEmpty()) return -1;
-                deviderSets.set(i, pair.getKey());
-                deviderSets.add(pair.getValue());
+                dividerSets.set(i, pair.getKey());
+                dividerSets.add(pair.getValue());
                 return size() - 1;
             }
 
             private int size() {
-                return deviderSets.size();
+                return dividerSets.size();
             }
 
             private boolean equal(Vector<T> set1, Vector<T> set2) {
@@ -59,13 +59,13 @@ public class DFAUtil {
 
             private int getIndex(T element) {
                 AtomicInteger index = new AtomicInteger(-1);
-                deviderSets.forEach(set -> {
-                    if (set.contains(element)) index.set(deviderSets.indexOf(set));
+                dividerSets.forEach(set -> {
+                    if (set.contains(element)) index.set(dividerSets.indexOf(set));
                 });
                 return index.get();
             }
 
-            private Pair<Set<T>, Set<T>> devide(Set<T> set, Predicate<T> filter) {
+            private Pair<Set<T>, Set<T>> divide(Set<T> set, Predicate<T> filter) {
                 HashSet<T> v1 = new HashSet<>(set);
                 v1.removeIf(filter);
                 HashSet<T> v2 = new HashSet<>(set);
@@ -76,21 +76,21 @@ public class DFAUtil {
         Divider<Integer> statesDivider = new Divider<>(allSet, acceptSet::contains);
 
         for (int i = 1; i < statesDivider.size(); i++) {
-            int state = (int) statesDivider.deviderSets.get(i).toArray()[0];
-            statesDivider.devideAt(i, s ->
+            int state = (int) statesDivider.dividerSets.get(i).toArray()[0];
+            statesDivider.divideAt(i, s ->
                     dfa.acceptAction.get(state).equals(dfa.acceptAction.get(s)));
         }
 
         while (divide < statesDivider.size()) {
             divide = statesDivider.size();
             for (int i = 0; i < statesDivider.size(); i++) {
-                int state = (int) statesDivider.deviderSets.get(i).toArray()[0];
-                while (statesDivider.devideAt(i, s ->
+                int state = (int) statesDivider.dividerSets.get(i).toArray()[0];
+                while (statesDivider.divideAt(i, s ->
                         statesDivider.equal(dfa.transitionTable.get(state), dfa.transitionTable.get(s))) > 0) {
                 }
             }
         }
-        return deleteStatesDuplicated(dfa, statesDivider.deviderSets);
+        return deleteStatesDuplicated(dfa, statesDivider.dividerSets);
     }
 
 
@@ -119,7 +119,6 @@ public class DFAUtil {
                 else newRow.add(null);
             }
             newTable.add(newRow);
-            //TODO: Make Sure action conflict when dfa accept state combines makes no sense
             if (dfa.acceptAction.containsKey(state))
                 newAction.put(toReplace.get(state), dfa.acceptAction.get(state));
         }
