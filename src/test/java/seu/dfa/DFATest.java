@@ -6,6 +6,8 @@ import seu.nfa.IntegratedNFA;
 import seu.nfa.NFA;
 import seu.nfa.NFAUtil;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 public class DFATest {
@@ -35,8 +37,8 @@ public class DFATest {
         infa.integrate(nfas.elementAt(1), "printf(\"if*\\n\");");
         DFA dfa = DFAUtil.integratedNFAtoDFA(infa);
         System.out.println(dfa.debugMessage());
-
-        DFAUtil.minimizeDFA(dfa);
+        dfa = DFAUtil.minimizeDFA(dfa);
+        System.out.println(dfa.debugMessage());
     }
 
     @Test
@@ -48,8 +50,7 @@ public class DFATest {
         infa.integrate(nfas.elementAt(0), "accept");
         DFA dfa = DFAUtil.integratedNFAtoDFA(infa);
         System.out.println(dfa.debugMessage());
-
-        DFAUtil.minimizeDFA(dfa);
+        dfa = DFAUtil.minimizeDFA(dfa);
+        System.out.println(dfa.debugMessage());
     }
-
 }

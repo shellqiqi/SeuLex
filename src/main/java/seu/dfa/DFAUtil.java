@@ -3,9 +3,7 @@ package seu.dfa;
 import javafx.util.Pair;
 import seu.nfa.IntegratedNFA;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -23,7 +21,7 @@ public class DFAUtil {
      *
      * @param dfa a DFA to be minimized
      */
-    public static void minimizeDFA(DFA dfa) {
+    public static DFA minimizeDFA(DFA dfa) {
         Set<Integer> acceptSet = dfa.acceptAction.keySet();
         HashSet<Integer> allSet = new HashSet<>();
         for (int i = 0; i < dfa.transitionTable.size(); i++) {
@@ -53,7 +51,7 @@ public class DFAUtil {
             private boolean equal(Vector<T> set1, Vector<T> set2) {
                 if (set1.size() != set2.size()) return false;
                 for (int i = 0; i < set1.size(); i++) {
-                    if(getIndex(set1.get(i)) != getIndex(set2.get(i)))
+                    if (getIndex(set1.get(i)) != getIndex(set2.get(i)))
                         return false;
                 }
                 return true;
@@ -82,11 +80,47 @@ public class DFAUtil {
             for (int i = 0; i < statesDivider.size(); i++) {
                 int state = (int) statesDivider.deviderSets.get(i).toArray()[0];
                 while (statesDivider.devideAt(i, s ->
-                        statesDivider.equal(dfa.transitionTable.get(state), dfa.transitionTable.get(s))) > 0) {}
+                        statesDivider.equal(dfa.transitionTable.get(state), dfa.transitionTable.get(s))) > 0) {
+                }
             }
         }
-        System.out.println(statesDivider.deviderSets);
-        //TODO: delete dupilicated states in DFA.
+        return deleteStatesDuplicated(dfa, statesDivider.deviderSets);
+    }
+
+
+    public static DFA deleteStatesDuplicated(DFA dfa, Vector<Set<Integer>> deviderSets) {
+        /* Key is state of origin dfa, value is a corresponding state of new dfa */
+        HashMap<Integer, Integer> toReplace = new HashMap<>();
+
+        int index = 0;
+        for (Set<Integer> set : deviderSets) {
+            for (Integer i : set) {
+                toReplace.put(i, index);
+            }
+            index++;
+        }
+
+        /* States of origin dfa which we use to generate a new dfa */
+        ArrayList<Integer> statesRemained = new ArrayList<>(toReplace.values());
+        int start = toReplace.get(DFA.start);
+        //TODO: fix the logical problem
+        Vector<Vector<Integer>> newTable = new Vector<>();
+        HashMap<Integer, String> newAction = new HashMap<>();
+        for (Integer state : statesRemained) {
+            Vector<Integer> newRow = new Vector<>();
+            for (Integer cell : dfa.transitionTable.get(state)) {
+                if (cell != null) newRow.add(toReplace.get(cell));
+                else newRow.add(null);
+            }
+            newTable.add(newRow);
+            if (dfa.acceptAction.containsKey(state))
+                newAction.put(toReplace.get(state), dfa.acceptAction.get(state));
+        }
+        return new DFA(newTable, newAction, start);
+    }
+
+    private static void deleteStatesDuplicated(DFA dfa) {
+
     }
 
     public static String transitionTableDebugMessage(Vector<Vector<Integer>> transitionTable) {

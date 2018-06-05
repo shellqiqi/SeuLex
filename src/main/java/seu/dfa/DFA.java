@@ -29,6 +29,11 @@ public class DFA {
         fillActionTable();
     }
 
+    public DFA(Vector<Vector<Integer>> transitionTable,HashMap<Integer, String> acceptAction, int start){
+        this.transitionTable = transitionTable;
+        this.acceptAction = acceptAction;
+    }
+
     /**
      * Get a closure of states which a NFA state can reach by 'ε's
      *
@@ -117,6 +122,23 @@ public class DFA {
             }
         }
     }
+
+    /**
+     * All state number subtract a value for every row shifting back.
+     *
+     * @param value Number to subtract.
+     * @return A copy of origin transition table with state number subtracted.
+     */
+    public Vector<Integer> decreaseStateNumberAtRow(int row, int value) {
+        Vector<Integer> stateRow = transitionTable.get(row);
+        Vector<Integer> newRow = new Vector<>();
+        for (Integer i : stateRow) {
+            if (i != null) newRow.add(i - value);
+            else newRow.add(null);
+        }
+        return newRow;
+    }
+
 
     /**
      * Get a table of DFA transition table.
