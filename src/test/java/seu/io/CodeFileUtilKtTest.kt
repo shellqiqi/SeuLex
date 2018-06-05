@@ -5,7 +5,6 @@ import org.junit.Test
 import org.junit.Assert.*
 import org.junit.BeforeClass
 import org.junit.Ignore
-import seu.dfa.DFA
 import seu.dfa.DFAUtil
 import seu.nfa.IntegratedNFA
 import seu.nfa.NFA
@@ -15,7 +14,7 @@ import java.util.*
 class CodeFileUtilKtTest {
 
     companion object {
-        lateinit var dfa: DFA
+        lateinit var codeFileUtil: CodeFileUtil
         @BeforeClass
         @JvmStatic
         fun beforeClass() {
@@ -25,31 +24,32 @@ class CodeFileUtilKtTest {
             val infa = IntegratedNFA()
             infa.integrate(nfas[0], "cout << yytext << \" i*f\" << endl;")
             infa.integrate(nfas[1], "cout << yytext << \" if*\" << endl;")
-            dfa = DFAUtil.integratedNFAtoDFA(infa)
+            val dfa = DFAUtil.integratedNFAtoDFA(infa)
+            codeFileUtil = CodeFileUtil(dfa)
         }
     }
 
     @Test
     @Ignore
     fun acceptFunctionsTest() {
-        print(acceptFunctions(dfa))
+        print(codeFileUtil.acceptFunctions())
     }
 
     @Test
     @Ignore
     fun transitionTableTest() {
-        print(transitionTable(dfa))
+        print(codeFileUtil.transitionTable())
     }
 
     @Test
     @Ignore
     fun actionMapTest() {
-        print(actionMap(dfa))
+        print(codeFileUtil.actionMap())
     }
 
     @Test
     @Ignore
     fun generateTest() {
-        print(generate(dfa))
+        print(codeFileUtil.generate())
     }
 }

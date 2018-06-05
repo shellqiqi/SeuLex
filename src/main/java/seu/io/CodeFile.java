@@ -20,7 +20,7 @@ public class CodeFile {
     public void writeFile(String filePath) throws IOException {
         writer = new BufferedWriter(new FileWriter(filePath));
         writeHeaders();
-        writer.write(CodeFileUtilKt.generate(dfa));
+        writer.write(new CodeFileUtil(dfa).generate());
         writeUserSeg();
         writer.close();
     }

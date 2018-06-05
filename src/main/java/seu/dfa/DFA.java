@@ -11,7 +11,7 @@ public class DFA {
     /* The transition table of the DFA */
     public Vector<Vector<Integer>> transitionTable = new Vector<>();
     /* State to start */
-    public final static int start = 0;
+    public int start = 0;
     /* State to accept and action */
     public HashMap<Integer, String> acceptAction = new HashMap<>();
     /* The closure table of dfa */
