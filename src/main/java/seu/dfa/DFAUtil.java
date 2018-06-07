@@ -78,7 +78,7 @@ public class DFAUtil {
         for (int i = 1; i < statesDivider.size(); i++) {
             int state = (int) statesDivider.dividerSets.get(i).toArray()[0];
             statesDivider.divideAt(i, s ->
-                    dfa.acceptAction.get(state).equals(dfa.acceptAction.get(s)));
+                    !dfa.acceptAction.get(state).equals(dfa.acceptAction.get(s)));
         }
 
         while (divide < statesDivider.size()) {

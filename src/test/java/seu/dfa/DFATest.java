@@ -2,12 +2,10 @@ package seu.dfa;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import seu.io.LexFile;
 import seu.nfa.IntegratedNFA;
 import seu.nfa.NFA;
 import seu.nfa.NFAUtil;
-
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Vector;
 
 public class DFATest {
@@ -49,6 +47,17 @@ public class DFATest {
         IntegratedNFA infa = new IntegratedNFA();
         infa.integrate(nfas.elementAt(0), "accept");
         DFA dfa = DFAUtil.integratedNFAtoDFA(infa);
+        System.out.println(dfa.debugMessage());
+        dfa = DFAUtil.minimizeDFA(dfa);
+        System.out.println(dfa.debugMessage());
+    }
+
+    @Test
+    @Ignore
+    public void minimizeDFATest3() throws Exception {
+        LexFile lexFile = new LexFile("resource/example2.lex");
+        IntegratedNFA nfa = new IntegratedNFA(lexFile.regExps);
+        DFA dfa = new DFA(nfa);
         System.out.println(dfa.debugMessage());
         dfa = DFAUtil.minimizeDFA(dfa);
         System.out.println(dfa.debugMessage());
