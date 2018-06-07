@@ -35,9 +35,10 @@ public class LexFile {
             else if (lineOfReader.startsWith("%%")) return;
             else if (lineOfReader.startsWith("%{")) readHeaders();
             else {
-                int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
-                String macro = lineOfReader.substring(0, firstIndexOfWhiteSpace);
-                String definition = expandMacro(lineOfReader.substring(firstIndexOfWhiteSpace).trim());
+                String[] splits = lineOfReader.split("[ \t]", 2);
+                if (splits.length != 2) continue;
+                String macro = expandMacro(splits[0]);
+                String definition = splits[1].trim();
                 macros.put(macro, definition);
             }
         }
@@ -58,9 +59,10 @@ public class LexFile {
             if (lineOfReader == null) throw new Exception("Lex format error - miss user segment");
             else if (lineOfReader.startsWith("%%")) return;
             else {
-                int firstIndexOfWhiteSpace = lineOfReader.indexOf(' ');
-                String regExp = expandMacro(lineOfReader.substring(0, firstIndexOfWhiteSpace));
-                String action = lineOfReader.substring(firstIndexOfWhiteSpace).trim();
+                String[] splits = lineOfReader.split("[ \t]+[{]", 2);
+                if (splits.length != 2) continue;
+                String regExp = expandMacro(splits[0]);
+                String action = "{" + splits[1];
                 regExps.add(new Pair<>(regExp, action));
             }
         }
