@@ -13,6 +13,8 @@ class CodeFileUtil(private val dfa: DFA) {
             using namespace std;
             string yytext;
             unsigned int yylength;
+            FILE* yyin = stdin;
+            FILE* yyout = stdout;
             """.trimIndent()
         return head + '\n' +
                 transitionTable() + '\n' +
@@ -53,16 +55,16 @@ class CodeFileUtil(private val dfa: DFA) {
 
     fun yylex(): String {
         return """
-            int yylex(istream& in) {
+            int yylex() {
                 int state = ${dfa.start};
-                char nextChar;
+                int nextChar;
                 yytext = "";
                 yylength = 0;
                 int lastAccept = -1;
                 unsigned int lastLength = 0;
 
                 while (true) {
-                    nextChar = in.get();
+                    nextChar = fgetc(yyin);
                     if (nextChar == EOF) return -1;
                     state = transitionTable[state][nextChar];
                     yytext.push_back(nextChar);
@@ -73,7 +75,7 @@ class CodeFileUtil(private val dfa: DFA) {
                     }
                     if (state == -1) {
                         while (yylength > lastLength + (lastAccept == -1)) {
-                            in.unget();
+                            fseek(yyin, -1, SEEK_CUR);
                             yytext.pop_back();
                             yylength--;
                         }
