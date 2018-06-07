@@ -235,7 +235,12 @@ int check_type()
 int main()
 {
 	int ID;
-	fopen_s(&yyin,"in.cpp","r");//输入自己的input文件
+	fopen_s(&yyin, "in.cpp", "r");//输入自己的input文件
+	if (NULL == yyin)
+	{
+		cerr << "Wrong path input.\n";
+		return -1;
+	}
 	while ((ID = yylex()) >= 0)
 	{
 		fprintf(yyout, "%s%s%s%d%c", "Match word: ", &yytext[0], "\tID: ", ID, '\n');

@@ -64,18 +64,31 @@ class CodeFileUtil(private val dfa: DFA) {
                 unsigned int lastLength = 0;
 
                 while (true) {
-                    nextChar = fgetc(yyin);
-                    if (nextChar == EOF) return -1;
-                    state = transitionTable[state][nextChar];
-                    yytext.push_back(nextChar);
-                    yylength++;
-                    if (actionMap.find(state) != actionMap.end()) {
-                        lastAccept = state;
-                        lastLength = yylength;
+                    if (stdin == yyin)
+                        nextChar = cin.get();
+                    else
+                        nextChar = fgetc(yyin);
+                    if (nextChar == EOF)
+                        if (0 == yylength)
+                            return -1;
+                        else
+                            state = -1;
+                    else
+                    {
+                        state = transitionTable[state][nextChar];
+                        yytext.push_back(nextChar);
+                        yylength++;
+                        if (actionMap.find(state) != actionMap.end()) {
+                            lastAccept = state;
+                            lastLength = yylength;
+                        }
                     }
                     if (state == -1) {
                         while (yylength > lastLength + (lastAccept == -1)) {
-                            fseek(yyin, -1, SEEK_CUR);
+                            if (stdin == yyin)
+                                cin.unget();
+                            else
+                                fseek(yyin, -1, SEEK_CUR);
                             yytext.pop_back();
                             yylength--;
                         }
