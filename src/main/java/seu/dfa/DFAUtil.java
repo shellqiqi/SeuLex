@@ -22,9 +22,10 @@ public class DFAUtil {
      * @param dfa a DFA to be minimized
      */
     public static DFA minimizeDFA(DFA dfa) {
+        Vector<Vector<Integer>> transitionTable =dfa.transitionTable;
         Set<Integer> acceptSet = dfa.acceptAction.keySet();
         HashSet<Integer> allSet = new HashSet<>();
-        for (int i = 0; i < dfa.transitionTable.size(); i++) {
+        for (int i = 0; i < transitionTable.size(); i++) {
             allSet.add(i);
         }
         int divide = 1;
@@ -58,11 +59,12 @@ public class DFAUtil {
             }
 
             private int getIndex(T element) {
-                AtomicInteger index = new AtomicInteger(-1);
-                dividerSets.forEach(set -> {
-                    if (set.contains(element)) index.set(dividerSets.indexOf(set));
-                });
-                return index.get();
+                Integer index = 0;
+                for (Set<T> set : dividerSets) {
+                    if (set.contains(element)) return index;
+                    index++;
+                }
+                return -1;
             }
 
             private Pair<Set<T>, Set<T>> divide(Set<T> set, Predicate<T> filter) {
@@ -84,9 +86,10 @@ public class DFAUtil {
         while (divide < statesDivider.size()) {
             divide = statesDivider.size();
             for (int i = 0; i < statesDivider.size(); i++) {
+                if (statesDivider.dividerSets.get(i).size() < 2)  continue;
                 int state = (int) statesDivider.dividerSets.get(i).toArray()[0];
                 while (statesDivider.divideAt(i, s ->
-                        statesDivider.equal(dfa.transitionTable.get(state), dfa.transitionTable.get(s))) > 0) {
+                        statesDivider.equal(transitionTable.get(state), transitionTable.get(s))) > 0) {
                 }
             }
         }
