@@ -4,7 +4,6 @@ import javafx.util.Pair;
 import seu.nfa.IntegratedNFA;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 public class DFAUtil {
@@ -22,7 +21,7 @@ public class DFAUtil {
      * @param dfa a DFA to be minimized
      */
     public static DFA minimizeDFA(DFA dfa) {
-        Vector<Vector<Integer>> transitionTable =dfa.transitionTable;
+        final Vector<Vector<Integer>> transitionTable = dfa.transitionTable;
         Set<Integer> acceptSet = dfa.acceptAction.keySet();
         HashSet<Integer> allSet = new HashSet<>();
         for (int i = 0; i < transitionTable.size(); i++) {
@@ -78,33 +77,32 @@ public class DFAUtil {
         Divider<Integer> statesDivider = new Divider<>(allSet, acceptSet::contains);
 
         for (int i = 1; i < statesDivider.size(); i++) {
-            int state = (int) statesDivider.dividerSets.get(i).toArray()[0];
-            statesDivider.divideAt(i, s ->
-                    !dfa.acceptAction.get(state).equals(dfa.acceptAction.get(s)));
+            int state = new Vector<>(statesDivider.dividerSets.get(i)).firstElement();
+            statesDivider.divideAt(i,
+                    s -> !dfa.acceptAction.get(state).equals(dfa.acceptAction.get(s)));
         }
 
         while (divide < statesDivider.size()) {
             divide = statesDivider.size();
             for (int i = 0; i < statesDivider.size(); i++) {
-                if (statesDivider.dividerSets.get(i).size() < 2)  continue;
-                int state = (int) statesDivider.dividerSets.get(i).toArray()[0];
-                while (statesDivider.divideAt(i, s ->
-                        statesDivider.equal(transitionTable.get(state), transitionTable.get(s))) > 0) {
-                }
+                if (statesDivider.dividerSets.get(i).size() < 2) continue;
+                int state = new Vector<>(statesDivider.dividerSets.get(i)).firstElement();
+                while (statesDivider.divideAt(i,
+                        s -> statesDivider.equal(transitionTable.get(state), transitionTable.get(s))) > 0) ;
             }
         }
         return deleteStatesDuplicated(dfa, statesDivider.dividerSets);
     }
 
 
-    public static DFA deleteStatesDuplicated(DFA dfa, Vector<Set<Integer>> deviderSets) {
+    public static DFA deleteStatesDuplicated(DFA dfa, Vector<Set<Integer>> dividerSets) {
         /* Key is state of origin dfa, value is a corresponding state of new dfa */
         HashMap<Integer, Integer> toReplace = new HashMap<>();
         /* States of origin dfa which we use to generate a new dfa */
         ArrayList<Integer> statesRemained = new ArrayList<>();
 
         int index = 0;
-        for (Set<Integer> set : deviderSets) {
+        for (Set<Integer> set : dividerSets) {
             for (Integer i : set) {
                 toReplace.put(i, index);
             }
