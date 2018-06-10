@@ -57,6 +57,7 @@
 #define RETURN 181
 #define SUB_ASSIGN 182
 #define SIGNED 183
+#define TYPE_NAME 184
 
 void count();
 int yywrap();
