@@ -10,6 +10,7 @@ class CodeFileUtil(private val dfa: DFA) {
             #include <iostream>
             #include <string>
             #include <unordered_map>
+            #include "yy.tab.h"
             using namespace std;
             string yytext;
             unsigned int yylength;
