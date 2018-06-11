@@ -10,7 +10,7 @@ public class App {
     public static void main(String[] args) {
         try {
             if (args.length != 2) {
-                System.out.println("Please input a file.");
+                System.out.println("Need two arguments - InputFile OutputFile");
                 return;
             }
             LexFile lexFile = new LexFile(args[0]);
