@@ -51,7 +51,7 @@ public class LexFileTest {
     @Test
     public void readUserSeg() {
         assertEquals("int main() {\n" +
-                "    std::cout << \"hello world\" << std::endl;\n" +
+                "\twhile (yylex(cin)>=0) ;\n" +
                 "}\n", lexFile.userSeg.toString());
     }
 }

@@ -25,7 +25,7 @@ public class LexFileTest2 {
         expected.put("D", "[0-9]");
         expected.put("L", "[a-zA-Z_]");
         expected.put("H", "[a-fA-F0-9]");
-        expected.put("E", "[Ee][+-]?{D}+");
+        expected.put("E", "[Ee][+-]?[0-9]+");
         expected.put("FS", "(f|F|l|L)");
         expected.put("IS", "(u|U|l|L)*");
         assertEquals(expected, lexFile.macros);

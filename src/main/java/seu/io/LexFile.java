@@ -37,8 +37,8 @@ public class LexFile {
             else {
                 String[] splits = lineOfReader.split("[ \t]", 2);
                 if (splits.length != 2) continue;
-                String macro = expandMacro(splits[0]);
-                String definition = splits[1].trim();
+                String macro = splits[0];
+                String definition = expandMacro(splits[1].trim());
                 macros.put(macro, definition);
             }
         }
