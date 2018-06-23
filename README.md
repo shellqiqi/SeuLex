@@ -2,11 +2,11 @@
 
 A Lexical-Analyzer Generator written in Java. The target language is C++.
 
-Its core tech are reverse polish notation.
+Its core tech is reverse polish notation.
 
 ## Build
 
-Use maven to package
+Use maven to package.
 
 ## Usage
 
